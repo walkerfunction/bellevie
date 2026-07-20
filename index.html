@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Belle Vie Studios | Handcrafted Pottery, Jewelry & Home Decor</title>
   <meta name="description" content="One-of-a-kind handcrafted pottery, jewelry, and home decor by Belle Vie Studios. Inspired by South Asian creativity, crafted with sustainability and zero waste.">
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/favicon-180.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="images/favicon-512.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -81,6 +84,10 @@
       color: var(--marigold); letter-spacing: 0.3em; text-transform: uppercase;
       margin-bottom: 20px;
     }
+    .hero-logo {
+      display: block; width: 200px; max-width: 55%;
+      margin: 24px auto 4px; height: auto;
+    }
     .hero h1 {
       font-family: var(--serif); font-size: 3rem; font-weight: 700;
       color: var(--text); line-height: 1.15; margin-bottom: 20px;
@@ -131,14 +138,14 @@
 
     /* ============ PRODUCT SECTIONS ============ */
     .section { padding: 56px 0; }
-    .section-head {
+    .section-header {
       display: flex; align-items: center; gap: 12px;
       margin-bottom: 24px;
     }
-    .section-head h2 {
+    .section-header h2 {
       font-family: var(--serif); font-size: 1.6rem; font-weight: 700;
     }
-    .section-head::after {
+    .section-header::after {
       content: ''; flex: 1; height: 1px; background: var(--border);
     }
     .section-count {
@@ -213,8 +220,16 @@
       margin: 48px 0; padding: 56px 40px;
       background: linear-gradient(135deg, var(--indigo) 0%, #4a3f6e 100%);
       border-radius: var(--radius-lg);
-      color: #fff; display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
+      color: #fff; display: grid; grid-template-columns: 0.8fr 1fr 1fr; gap: 32px;
       align-items: center; position: relative; overflow: hidden;
+    }
+    .story-photo {
+      position: relative; z-index: 1;
+      border-radius: 12px; overflow: hidden;
+      aspect-ratio: 3 / 4; box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+    }
+    .story-photo img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
     }
     .story-banner::after {
       content: ''; position: absolute; right: -40px; top: -40px;
@@ -314,6 +329,7 @@
       .card-body { padding: 10px 12px 14px; }
       .card-title { font-size: 0.92rem; }
       .story-banner { grid-template-columns: 1fr; padding: 36px 24px; }
+      .story-photo { aspect-ratio: 16 / 10; max-width: 320px; margin: 0 auto; }
       .footer-inner { flex-direction: column; }
       .footer-links { gap: 24px; }
       .cat-strip-inner { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; padding: 0 16px;
@@ -346,7 +362,7 @@
   <!-- HERO -->
   <section class="hero">
     <div class="hero-deco"></div>
-    <div class="hero-eyebrow">Belle Vie Studios</div>
+    <img src="images/logo.png" alt="Belle Vie Studios" class="hero-logo">
     <h1>Crafted by Hand, Rooted in <em>Tradition</em></h1>
     <p class="hero-desc">Each piece begins as raw material and becomes something personal &mdash; shaped by hand, inspired by South Asian artistry, and made to last a lifetime.</p>
     <a href="#jewelry" class="hero-cta">Browse the Collection</a>
@@ -357,7 +373,7 @@
     <div class="cat-strip-inner">
       <a href="#jewelry" class="cat-pill">
         <span class="cat-pill-icon">&#x1F48D;</span>
-        <span class="cat-pill-label">Jewelry<span>1 pieces</span></span>
+        <span class="cat-pill-label">Jewelry<span>1 piece</span></span>
       </a><a href="#pottery" class="cat-pill">
         <span class="cat-pill-icon">&#x1F3FA;</span>
         <span class="cat-pill-label">Pottery<span>3 pieces</span></span>
@@ -525,6 +541,9 @@
   <section id="our-story">
     <div class="container">
       <div class="story-banner">
+        <div class="story-photo">
+          <img src="images/gphoto_8.jpg" alt="Hand-painting a ceramic portrait plate in the Belle Vie Studios workshop" loading="lazy">
+        </div>
         <div class="story-text">
           <h2>The Beautiful Life, by Hand</h2>
           <p><em>Belle Vie</em> means &ldquo;beautiful life&rdquo; &mdash; and that is what every piece is made to bring into your world.</p>
@@ -764,9 +783,10 @@
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; 2026 Belle Vie Studios &mdash; March 28, 2026
+      &copy; <span id="footerYear"></span> Belle Vie Studios
     </div>
   </footer>
+  <script>document.getElementById('footerYear').textContent = new Date().getFullYear();</script>
 
 </body>
 </html>
