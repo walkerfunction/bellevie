@@ -436,6 +436,36 @@
       display: flex; align-items: center; justify-content: center;
     }
 
+    /* ── NEXT EVENT CARD ── */
+    .next-event {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 22px;
+      padding: 9px 16px 9px 14px;
+      background: rgba(0,0,0,0.38);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(200,150,12,0.45);
+      border-radius: 40px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+      max-width: calc(100vw - 48px);
+    }
+    .next-event:hover { background: rgba(0,0,0,0.55); border-color: rgba(200,150,12,0.8); }
+    .next-event-eye {
+      font-size: 0.62rem; font-weight: 400; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--gold-lt);
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .next-event-name {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 0.85rem; font-weight: 300; color: #fff;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      letter-spacing: 0.02em;
+    }
+    .next-event-arrow {
+      font-size: 0.8rem; color: var(--gold-lt); flex-shrink: 0; margin-left: 2px;
+    }
+
     /* ── MUSIC TOGGLE BUTTON ── */
     .music-btn {
       position: absolute;
@@ -514,6 +544,15 @@
         <img src="images/logo-t.png" alt="Belle Vie Studios" class="hero-logo">
 
         <p class="hero-sub">Pottery · Jewelry · Home Decor</p>
+
+        <a class="next-event" href="https://www.headwestmarketplace.com/statestreet" target="_blank" rel="noopener">
+          <span class="next-event-eye">Next Event</span>
+          <span class="next-event-name">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><rect x="1" y="2.5" width="11" height="9.5" rx="1.2"/><path d="M1 5.5h11M4 1v3M9 1v3"/></svg>
+            Head West Marketplace
+          </span>
+          <span class="next-event-arrow">↗</span>
+        </a>
       </div>
 
       <!-- Side nav arrows on home panel -->
