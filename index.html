@@ -763,8 +763,8 @@ document.addEventListener('touchstart', e => {
 
 document.addEventListener('touchend', e => {
   if (tx0 === null) return;
-  // Skip if touch is inside products scroll or junior panel scroll
-  if (e.target.closest('.products-scroll') || e.target.closest('.panel-junior')) {
+  // Skip if touch is inside the collection products scroll (conflicts with drawer gesture)
+  if (e.target.closest('.products-scroll')) {
     tx0 = null; return;
   }
   const dx = e.changedTouches[0].clientX - tx0;
