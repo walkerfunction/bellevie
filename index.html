@@ -2,791 +2,715 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Belle Vie Studios | Handcrafted Pottery, Jewelry & Home Decor</title>
-  <meta name="description" content="One-of-a-kind handcrafted pottery, jewelry, and home decor by Belle Vie Studios. Inspired by South Asian creativity, crafted with sustainability and zero waste.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Belle Vie Studios</title>
+  <meta name="description" content="Handcrafted pottery, jewelry & home decor — each piece made with intention.">
   <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="images/favicon-180.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="images/favicon-512.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f8f5f1;
-      --bg-alt: #f0ece4;
-      --surface: #ffffff;
-      --clay: #b5654a;
-      --clay-deep: #8e4a33;
-      --clay-glow: #d4896e;
-      --indigo: #3d3b6e;
-      --indigo-light: #5c59a4;
-      --marigold: #d4943a;
-      --marigold-light: #f0c97a;
-      --text: #2a2522;
-      --text-mid: #5e554e;
-      --text-faint: #9e938a;
-      --border: #e2dbd2;
-      --red: #c45454;
-      --serif: 'Playfair Display', Georgia, serif;
-      --sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      --radius: 6px;
-      --radius-lg: 16px;
-      --shadow-sm: 0 1px 4px rgba(42,37,34,0.06);
-      --shadow-md: 0 6px 20px rgba(42,37,34,0.09);
-      --shadow-lift: 0 12px 36px rgba(42,37,34,0.12);
-      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      --gold: #C8960C;
+      --gold-lt: #E8B820;
+      --white: #FFFFFF;
+      --off: #FAF9F7;
+      --ink: #141210;
+      --ink-mid: #5a4f45;
+      --ink-faint: #a09588;
+      --rose: #D4607A;
+      --script: 'Pinyon Script', cursive;
+      --ui: 'Cormorant Garamond', Georgia, serif;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: var(--sans); background: var(--bg); color: var(--text);
-      line-height: 1.6; -webkit-font-smoothing: antialiased;
-    }
-    .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: var(--ui); -webkit-font-smoothing: antialiased; }
 
-    /* ============ NAV — minimal left-logo, right-links ============ */
-    .site-nav {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(248,245,241,0.92); backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-inner {
-      max-width: 1120px; margin: 0 auto; padding: 0 24px;
-      display: flex; align-items: center; justify-content: space-between;
-      height: 60px;
-    }
-    .nav-logo {
-      font-family: var(--serif); font-size: 1.35rem; font-weight: 700;
-      color: var(--clay); text-decoration: none;
-    }
-    .nav-links { display: flex; gap: 4px; align-items: center; }
-    .nav-link {
-      padding: 6px 14px; font-size: 0.85rem; font-weight: 500;
-      color: var(--text-mid); text-decoration: none;
-      border-radius: 20px; transition: 0.25s var(--ease);
-    }
-    .nav-link:hover { color: var(--clay); background: rgba(181,101,74,0.08); }
+    /* ─── APP SHELL ─── */
+    .app { position: fixed; inset: 0; overflow: hidden; }
 
-    /* ============ HERO — asymmetric with decorative border ============ */
-    .hero {
-      padding: 72px 24px 64px; text-align: center;
-      position: relative;
+    /* ─── HORIZONTAL TRACK ─── */
+    .h-track {
+      display: flex; width: 300%; height: 100%;
+      transform: translateX(-33.333%);
+      transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
     }
-    .hero-deco {
-      position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-      width: 80px; height: 3px;
-      background: linear-gradient(90deg, transparent, var(--marigold), transparent);
+    .panel { width: 33.333%; height: 100%; flex-shrink: 0; position: relative; overflow: hidden; }
+
+    /* ─── PANEL DOTS ─── */
+    .panel-dots {
+      position: fixed; bottom: env(safe-area-inset-bottom, 20px);
+      bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+      left: 50%; transform: translateX(-50%);
+      display: flex; gap: 8px; z-index: 900; pointer-events: none;
     }
-    .hero-eyebrow {
-      font-family: var(--sans); font-size: 0.72rem; font-weight: 600;
-      color: var(--marigold); letter-spacing: 0.3em; text-transform: uppercase;
-      margin-bottom: 20px;
+    .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: rgba(255,255,255,0.35);
+      transition: all 0.3s; pointer-events: all; cursor: pointer;
     }
+    .dot.active { width: 22px; border-radius: 3px; background: var(--gold); }
+
+    /* ─────────────────────────────────────────
+       INSTAGRAM PANEL (left)
+    ───────────────────────────────────────── */
+    .panel-ig {
+      background: #0a0a0a;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 48px 28px 80px;
+    }
+    .ig-gradient-icon {
+      width: 68px; height: 68px;
+      background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+      border-radius: 18px; display: flex; align-items: center; justify-content: center;
+      margin-bottom: 22px; box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+    }
+    .ig-gradient-icon svg { width: 38px; height: 38px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .ig-handle { font-size: 1.25rem; font-weight: 400; color: #fff; margin-bottom: 6px; letter-spacing: 0.04em; }
+    .ig-tagline { font-size: 0.8rem; color: rgba(255,255,255,0.45); margin-bottom: 32px; text-align: center; line-height: 1.5; }
+    .ig-photo-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 3px; width: 100%; max-width: 280px;
+      border-radius: 10px; overflow: hidden; margin-bottom: 32px;
+    }
+    .ig-photo {
+      aspect-ratio: 1; background-size: cover; background-position: center;
+      filter: brightness(0.8) saturate(0.9);
+    }
+    .ig-btn {
+      background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+      color: #fff; border: none; border-radius: 28px;
+      padding: 14px 40px; font-size: 1rem; font-weight: 400;
+      font-family: var(--ui); cursor: pointer; letter-spacing: 0.08em;
+      text-decoration: none; display: inline-block;
+      box-shadow: 0 6px 20px rgba(188,24,136,0.35);
+    }
+    .ig-swipe-label {
+      position: absolute; right: 16px; top: 50%;
+      transform: translateY(-50%) rotate(90deg);
+      font-size: 0.65rem; color: rgba(255,255,255,0.25);
+      letter-spacing: 0.18em; text-transform: uppercase;
+    }
+
+    /* ─────────────────────────────────────────
+       HOME PANEL (center)
+    ───────────────────────────────────────── */
+    .panel-home { background: #111; }
+
+    .hero-photo {
+      position: absolute; inset: 0;
+      background: url('images/gphoto_9.jpg') center 20%/cover no-repeat;
+      filter: brightness(1.05) saturate(1.1) contrast(0.95);
+    }
+    /* soft warm gradient at top so gold logo reads clearly, bright below */
+    .hero-photo::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom,
+        rgba(30,20,10,0.45) 0%,
+        rgba(20,14,6,0.15) 40%,
+        rgba(0,0,0,0) 70%
+      );
+    }
+
+    #waveCanvas {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 2;
+    }
+
+    .hero-content {
+      position: absolute; inset: 0; z-index: 3;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-start;
+      padding: 14vh 20px 100px; text-align: center;
+    }
+
     .hero-logo {
-      display: block; width: 200px; max-width: 55%;
-      margin: 24px auto 4px; height: auto;
-    }
-    .hero h1 {
-      font-family: var(--serif); font-size: 3rem; font-weight: 700;
-      color: var(--text); line-height: 1.15; margin-bottom: 20px;
-      max-width: 640px; margin-left: auto; margin-right: auto;
-    }
-    .hero h1 em {
-      font-style: italic; color: var(--clay);
-    }
-    .hero-desc {
-      font-size: 1.05rem; color: var(--text-mid); max-width: 540px;
-      margin: 0 auto 36px; line-height: 1.7;
-    }
-    .hero-cta {
-      display: inline-block; padding: 14px 40px;
-      background: var(--clay); color: #fff; border-radius: 32px;
-      font-weight: 600; font-size: 0.88rem; text-decoration: none;
-      letter-spacing: 0.04em; transition: 0.3s var(--ease);
-      box-shadow: 0 4px 16px rgba(181,101,74,0.25);
-    }
-    .hero-cta:hover { background: var(--clay-deep); transform: translateY(-2px);
-      box-shadow: 0 6px 24px rgba(181,101,74,0.35); }
-
-    /* ============ CATEGORY STRIP — horizontal scroll on mobile ============ */
-    .cat-strip {
-      padding: 40px 0 48px;
-      border-bottom: 1px solid var(--border);
-    }
-    .cat-strip-inner {
-      display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
-    }
-    .cat-pill {
-      display: flex; align-items: center; gap: 10px;
-      padding: 14px 28px; border-radius: 32px;
-      background: var(--surface); border: 1.5px solid var(--border);
-      text-decoration: none; color: var(--text);
-      font-weight: 500; font-size: 0.9rem;
-      transition: 0.3s var(--ease);
-      box-shadow: var(--shadow-sm);
-    }
-    .cat-pill:hover {
-      border-color: var(--clay-glow); box-shadow: var(--shadow-md);
-      transform: translateY(-2px);
-    }
-    .cat-pill-icon { font-size: 1.4rem; }
-    .cat-pill-label span {
-      display: block; font-size: 0.72rem; color: var(--text-faint); font-weight: 400;
+      width: min(300px, 78vw);
+      height: auto; display: block;
+      /* black logo → gold */
+      filter: brightness(0) sepia(1) saturate(4) hue-rotate(5deg) brightness(0.82);
+      drop-shadow: 0 4px 24px rgba(0,0,0,0.3);
+      margin-bottom: 28px;
     }
 
-    /* ============ PRODUCT SECTIONS ============ */
-    .section { padding: 56px 0; }
-    .section-header {
-      display: flex; align-items: center; gap: 12px;
-      margin-bottom: 24px;
-    }
-    .section-header h2 {
-      font-family: var(--serif); font-size: 1.6rem; font-weight: 700;
-    }
-    .section-header::after {
-      content: ''; flex: 1; height: 1px; background: var(--border);
-    }
-    .section-count {
-      font-size: 0.78rem; color: var(--text-faint); font-weight: 400;
-      background: var(--bg-alt); padding: 3px 10px; border-radius: 12px;
+    .hero-sub {
+      color: rgba(255,255,255,0.82);
+      font-size: clamp(0.65rem, 2.2vw, 0.82rem);
+      letter-spacing: 0.28em; text-transform: uppercase;
+      margin-bottom: 28px;
+      text-shadow: 0 1px 10px rgba(0,0,0,0.4);
     }
 
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
+    .browse-btn {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(200,150,12,0.6);
+      color: #fff; border-radius: 32px;
+      padding: 13px 38px; font-size: 1.1rem; font-weight: 300;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      font-family: var(--ui); cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .browse-btn:active { background: rgba(200,150,12,0.2); }
+
+    .swipe-up-cue {
+      position: absolute; bottom: calc(env(safe-area-inset-bottom, 0px) + 44px);
+      left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      z-index: 4; color: rgba(255,255,255,0.4);
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      transition: opacity 0.3s;
+    }
+    .swipe-up-cue svg { animation: floatUp 2.2s ease-in-out infinite; }
+    @keyframes floatUp {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-7px); }
     }
 
-    /* ============ PRODUCT CARD — rounded, soft, organic ============ */
-    .product-card {
-      background: var(--surface); border-radius: var(--radius-lg);
-      overflow: hidden; transition: 0.35s var(--ease);
-      box-shadow: var(--shadow-sm);
+    /* ─── COLLECTIONS DRAWER ─── */
+    .drawer {
+      position: absolute; inset: 0;
+      background: var(--white);
+      z-index: 10;
+      transform: translateY(100%);
+      transition: transform 0.48s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex; flex-direction: column;
     }
-    .product-card:hover {
-      box-shadow: var(--shadow-lift); transform: translateY(-5px);
+    .drawer.open { transform: translateY(0); }
+
+    .drawer-bar {
+      display: flex; align-items: center; padding: 14px 18px 12px;
+      border-bottom: 1px solid #ebebeb; flex-shrink: 0; gap: 12px;
     }
-    .card-img-wrap {
-      position: relative; overflow: hidden;
-      aspect-ratio: 4 / 5; background: var(--bg-alt);
-    }
-    .card-img {
-      width: 100%; height: 100%; object-fit: cover;
-      transition: transform 0.6s var(--ease);
-    }
-    .product-card:hover .card-img { transform: scale(1.06); }
-    .card-img-placeholder {
-      width: 100%; height: 100%;
+    .drawer-close {
+      background: #f3f3f3; border: none; border-radius: 50%;
+      width: 34px; height: 34px; font-size: 1rem; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      font-size: 3rem; opacity: 0.3;
+      color: var(--ink-mid); flex-shrink: 0;
     }
-    .sale-badge {
-      position: absolute; top: 12px; right: 12px;
-      background: var(--red); color: #fff;
-      padding: 4px 10px; border-radius: 20px;
-      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em;
+    .drawer-label { font-size: 1rem; font-weight: 400; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink); }
+
+    .cat-tabs {
+      display: flex; gap: 8px; padding: 12px 16px;
+      overflow-x: auto; flex-shrink: 0; scrollbar-width: none;
+    }
+    .cat-tabs::-webkit-scrollbar { display: none; }
+    .cat-tab {
+      flex-shrink: 0; padding: 8px 18px; border-radius: 24px;
+      font-size: 0.9rem; font-weight: 400;
+      letter-spacing: 0.06em;
+      border: 1px solid #e0ddd9; background: #fff; color: var(--ink-mid);
+      cursor: pointer; font-family: var(--ui); transition: 0.18s;
+    }
+    .cat-tab.active { background: var(--ink); border-color: var(--ink); color: #fff; }
+    .cat-tab.junior-tab.active { background: var(--rose); border-color: var(--rose); }
+
+    .products-scroll {
+      flex: 1; overflow-y: auto; padding: 12px 14px 80px;
+      overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+    }
+    .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+    .product-card {
+      background: var(--off); border-radius: 12px; overflow: hidden;
+      cursor: pointer; transition: transform 0.15s;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    .product-card:active { transform: scale(0.97); }
+    .card-img-wrap { aspect-ratio: 1; overflow: hidden; }
+    .card-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s; }
+    .product-card:hover .card-img { transform: scale(1.05); }
+    .card-body { padding: 10px 12px 14px; }
+    .card-title { font-size: 0.9rem; font-weight: 400; color: var(--ink); line-height: 1.3; margin-bottom: 4px; letter-spacing: 0.01em; }
+    .card-sub { font-size: 0.7rem; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 6px; }
+    .card-price { font-size: 1rem; font-weight: 300; color: var(--ink); letter-spacing: 0.04em; }
+    .card-price.jr { color: var(--rose); }
+
+    /* ─────────────────────────────────────────
+       BV JUNIOR PANEL (right)
+    ───────────────────────────────────────── */
+    .panel-junior { background: #FFF6F8; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+    .junior-hero {
+      padding: 64px 24px 36px; text-align: center;
+      background: linear-gradient(160deg, #fff0f3, #fff6f8 70%);
+      border-bottom: 1px solid rgba(212,96,122,0.1);
+    }
+    .junior-pill {
+      display: inline-block; background: var(--rose); color: #fff;
+      padding: 4px 16px; border-radius: 20px;
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; margin-bottom: 18px;
+    }
+    .junior-name {
+      font-size: clamp(2.4rem, 10vw, 3.2rem); font-weight: 800;
+      color: var(--ink); line-height: 1.05; margin-bottom: 14px;
+    }
+    .junior-name em { font-style: normal; color: var(--rose); }
+    .junior-blurb { font-size: 0.87rem; color: var(--ink-mid); line-height: 1.65; max-width: 280px; margin: 0 auto; }
+
+    .junior-products { padding: 18px 14px 80px; }
+    .junior-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .junior-card { border: 2px solid rgba(212,96,122,0.1); background: #fff; }
+    .junior-card .card-price { color: var(--rose); }
+
+    .jr-swipe-label {
+      position: absolute; left: 16px; top: 50%;
+      transform: translateY(-50%) rotate(-90deg);
+      font-size: 0.65rem; color: rgba(212,96,122,0.3);
+      letter-spacing: 0.18em; text-transform: uppercase;
+      pointer-events: none;
     }
 
-    .card-body { padding: 14px 16px 18px; }
-    .card-title {
-      font-family: var(--serif); font-size: 1.05rem; font-weight: 600;
-      margin-bottom: 2px; line-height: 1.3;
+    /* ─────────────────────────────────────────
+       LIGHTBOX — bottom sheet
+    ───────────────────────────────────────── */
+    .lightbox-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+      z-index: 2000; display: flex; align-items: flex-end;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
     }
-    .card-sub {
-      font-size: 0.75rem; color: var(--text-faint); text-transform: uppercase;
-      letter-spacing: 0.1em; display: block; margin-bottom: 8px;
-    }
-    .card-price { font-size: 0.95rem; font-weight: 600; }
-    .price-current { color: var(--text); }
-    .price-original {
-      text-decoration: line-through; color: var(--text-faint);
-      font-weight: 400; font-size: 0.85rem; margin-right: 8px;
-    }
-    .price-sale { color: var(--red); font-weight: 700; }
+    .lightbox-overlay.active { opacity: 1; pointer-events: all; }
 
-    .btn-buy {
-      display: block; text-align: center; margin-top: 12px;
-      padding: 10px; border-radius: 24px;
-      background: var(--clay); color: #fff;
-      font-size: 0.8rem; font-weight: 600; text-decoration: none;
-      letter-spacing: 0.04em; transition: 0.25s var(--ease);
+    .lb-sheet {
+      background: #fff; width: 100%;
+      max-height: 88vh; border-radius: 20px 20px 0 0;
+      overflow-y: auto; -webkit-overflow-scrolling: touch;
+      transform: translateY(100%);
+      transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+      padding-bottom: env(safe-area-inset-bottom, 20px);
     }
-    .btn-buy:hover { background: var(--clay-deep); }
+    .lightbox-overlay.active .lb-sheet { transform: translateY(0); }
 
-    /* ============ STORY BANNER — unique to Belle Vie ============ */
-    .story-banner {
-      margin: 48px 0; padding: 56px 40px;
-      background: linear-gradient(135deg, var(--indigo) 0%, #4a3f6e 100%);
-      border-radius: var(--radius-lg);
-      color: #fff; display: grid; grid-template-columns: 0.8fr 1fr 1fr; gap: 32px;
-      align-items: center; position: relative; overflow: hidden;
-    }
-    .story-photo {
-      position: relative; z-index: 1;
-      border-radius: 12px; overflow: hidden;
-      aspect-ratio: 3 / 4; box-shadow: 0 12px 30px rgba(0,0,0,0.35);
-    }
-    .story-photo img {
-      width: 100%; height: 100%; object-fit: cover; display: block;
-    }
-    .story-banner::after {
-      content: ''; position: absolute; right: -40px; top: -40px;
-      width: 200px; height: 200px; border-radius: 50%;
-      background: rgba(212,148,58,0.15);
-    }
-    .story-banner::before {
-      content: ''; position: absolute; left: -20px; bottom: -60px;
-      width: 160px; height: 160px; border-radius: 50%;
-      background: rgba(181,101,74,0.12);
-    }
-    .story-text { position: relative; z-index: 1; }
-    .story-text h2 {
-      font-family: var(--serif); font-size: 1.8rem; font-weight: 700;
-      margin-bottom: 16px; line-height: 1.2;
-    }
-    .story-text p {
-      font-size: 0.92rem; color: rgba(255,255,255,0.75); line-height: 1.7;
-      margin-bottom: 8px;
-    }
-    .story-values {
-      position: relative; z-index: 1;
-      display: flex; flex-direction: column; gap: 16px;
-    }
-    .story-value {
-      display: flex; align-items: flex-start; gap: 14px;
-      padding: 16px; border-radius: 12px;
-      background: rgba(255,255,255,0.08);
-      backdrop-filter: blur(4px);
-    }
-    .story-value-icon {
-      font-size: 1.5rem; flex-shrink: 0; margin-top: 2px;
-    }
-    .story-value h3 {
-      font-size: 0.92rem; font-weight: 600; margin-bottom: 2px;
-    }
-    .story-value p {
-      font-size: 0.82rem; color: rgba(255,255,255,0.6); line-height: 1.5;
-      margin: 0;
+    .lb-drag-handle {
+      width: 40px; height: 4px; background: #e0e0e0;
+      border-radius: 2px; margin: 12px auto 0;
     }
 
-    /* ============ SOCIAL — inline with warm tone ============ */
-    .social-strip {
-      padding: 48px 0; text-align: center;
-      border-top: 1px solid var(--border);
+    .lb-img-area { position: relative; }
+    .lb-img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
+    .lb-arrow {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(0,0,0,0.35); border: none; color: #fff;
+      width: 40px; height: 40px; border-radius: 50%; font-size: 1.3rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
     }
-    .social-strip p {
-      font-family: var(--serif); font-size: 1.2rem; color: var(--text-mid);
-      margin-bottom: 16px;
-    }
-    .social-strip p em { color: var(--clay); }
-    .ig-link {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 12px 28px; border-radius: 28px;
-      border: 1.5px solid var(--clay-glow); color: var(--clay);
-      text-decoration: none; font-weight: 600; font-size: 0.88rem;
-      transition: 0.3s var(--ease);
-    }
-    .ig-link:hover {
-      background: var(--clay); color: #fff; border-color: var(--clay);
-    }
-    .ig-link svg { flex-shrink: 0; }
+    .lb-arrow.prev { left: 12px; }
+    .lb-arrow.next { right: 12px; }
+    .lb-arrow.hidden { display: none; }
+    .lb-dots { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; }
+    .lb-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.5); cursor: pointer; }
+    .lb-dot.active { background: #fff; }
 
-    /* ============ FOOTER — warm, simple ============ */
-    .site-footer {
-      background: var(--text); color: rgba(255,255,255,0.6);
-      padding: 40px 24px 28px;
+    .lb-info { padding: 18px 20px 6px; }
+    .lb-name { font-size: 1.05rem; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+    .lb-sub { font-size: 0.72rem; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 10px; }
+    .lb-price { font-size: 1.15rem; font-weight: 800; color: var(--ink); margin-bottom: 12px; }
+    .lb-desc { font-size: 0.86rem; color: var(--ink-mid); line-height: 1.65; margin-bottom: 16px; }
+    .lb-meta { font-size: 0.78rem; color: var(--ink-faint); display: flex; flex-direction: column; gap: 4px; margin-bottom: 20px; }
+    .lb-buy {
+      display: block; width: 100%; background: var(--ink); color: #fff;
+      border: none; border-radius: 14px; padding: 16px;
+      font-size: 0.95rem; font-weight: 700; font-family: var(--ui);
+      cursor: pointer; letter-spacing: 0.05em; margin: 0 0 4px;
     }
-    .footer-inner {
-      max-width: 1120px; margin: 0 auto;
-      display: flex; align-items: flex-start; justify-content: space-between;
-      flex-wrap: wrap; gap: 32px;
-    }
-    .footer-brand { font-family: var(--serif); font-size: 1.2rem; font-weight: 700; color: var(--clay-glow); margin-bottom: 8px; }
-    .footer-desc { font-size: 0.82rem; max-width: 340px; line-height: 1.7; }
-    .footer-links { display: flex; gap: 32px; }
-    .footer-col h4 {
-      font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.15em; color: rgba(255,255,255,0.35); margin-bottom: 10px;
-    }
-    .footer-col a {
-      display: block; color: rgba(255,255,255,0.6); text-decoration: none;
-      font-size: 0.85rem; margin-bottom: 6px; transition: color 0.2s;
-    }
-    .footer-col a:hover { color: var(--clay-glow); }
-    .footer-bottom {
-      max-width: 1120px; margin: 24px auto 0; padding-top: 16px;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      text-align: center; font-size: 0.72rem; color: rgba(255,255,255,0.3);
-    }
-
-    /* ============ RESPONSIVE ============ */
-    @media (max-width: 768px) {
-      .hero { padding: 48px 20px 40px; }
-      .hero h1 { font-size: 2.2rem; }
-      .product-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-      .card-body { padding: 10px 12px 14px; }
-      .card-title { font-size: 0.92rem; }
-      .story-banner { grid-template-columns: 1fr; padding: 36px 24px; }
-      .story-photo { aspect-ratio: 16 / 10; max-width: 320px; margin: 0 auto; }
-      .footer-inner { flex-direction: column; }
-      .footer-links { gap: 24px; }
-      .cat-strip-inner { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; padding: 0 16px;
-        -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-      .cat-strip-inner::-webkit-scrollbar { display: none; }
-      .cat-pill { flex-shrink: 0; }
-    }
-    @media (max-width: 480px) {
-      .hero h1 { font-size: 1.8rem; }
-      .nav-logo { font-size: 1.15rem; }
-      .nav-link { padding: 4px 10px; font-size: 0.78rem; }
-      .product-grid { gap: 10px; }
-      .card-img-wrap { aspect-ratio: 3 / 4; }
+    .lb-close {
+      position: absolute; top: calc(12vh + 10px); right: 14px;
+      background: #fff; border: none; border-radius: 50%;
+      width: 34px; height: 34px; font-size: 1rem; cursor: pointer;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2); z-index: 10;
+      display: flex; align-items: center; justify-content: center;
     }
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav class="site-nav">
-    <div class="nav-inner">
-      <a href="/" class="nav-logo">Belle Vie</a>
-      <div class="nav-links">
-        <a href="#jewelry" class="nav-link">Jewelry</a><a href="#pottery" class="nav-link">Pottery</a><a href="#home-decor" class="nav-link">Home Decor</a>
-        <a href="#our-story" class="nav-link">Our Story</a>
-      </div>
-    </div>
-  </nav>
+<div class="app">
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-deco"></div>
-    <img src="images/logo.png" alt="Belle Vie Studios" class="hero-logo">
-    <h1>Crafted by Hand, Rooted in <em>Tradition</em></h1>
-    <p class="hero-desc">Each piece begins as raw material and becomes something personal &mdash; shaped by hand, inspired by South Asian artistry, and made to last a lifetime.</p>
-    <a href="#jewelry" class="hero-cta">Browse the Collection</a>
-  </section>
+  <!-- HORIZONTAL PANEL TRACK -->
+  <div class="h-track" id="hTrack">
 
-  <!-- CATEGORY PILLS -->
-  <section class="cat-strip">
-    <div class="cat-strip-inner">
-      <a href="#jewelry" class="cat-pill">
-        <span class="cat-pill-icon">&#x1F48D;</span>
-        <span class="cat-pill-label">Jewelry<span>1 piece</span></span>
-      </a><a href="#pottery" class="cat-pill">
-        <span class="cat-pill-icon">&#x1F3FA;</span>
-        <span class="cat-pill-label">Pottery<span>3 pieces</span></span>
-      </a><a href="#home-decor" class="cat-pill">
-        <span class="cat-pill-icon">&#x1F3E0;</span>
-        <span class="cat-pill-label">Home Decor<span>2 pieces</span></span>
-      </a>
+    <!-- ══════════ INSTAGRAM PANEL ══════════ -->
+    <div class="panel panel-ig">
+      <div class="ig-gradient-icon">
+        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="#fff" stroke="none"/></svg>
+      </div>
+      <div class="ig-handle">@bellevie_studios</div>
+      <div class="ig-tagline">Studio life · Handcraft · One-of-a-kind</div>
+      <div class="ig-photo-grid">
+        <div class="ig-photo" style="background-image:url('images/gphoto_9.jpg')"></div>
+        <div class="ig-photo" style="background-image:url('images/gphoto_5.jpg')"></div>
+        <div class="ig-photo" style="background-image:url('images/gphoto_3.jpg')"></div>
+        <div class="ig-photo" style="background-image:url('images/gphoto_6.jpg')"></div>
+        <div class="ig-photo" style="background-image:url('images/gphoto_7.jpg')"></div>
+        <div class="ig-photo" style="background-image:url('images/gphoto_8.jpg')"></div>
+      </div>
+      <a href="https://www.instagram.com/bellevie_studios/" target="_blank" rel="noopener" class="ig-btn">Open Instagram ↗</a>
+      <div class="ig-swipe-label">← SWIPE RIGHT FOR HOME →</div>
     </div>
-  </section>
 
-  <!-- PRODUCT SECTIONS -->
-  
-  <section class="section" id="jewelry">
-    <div class="container">
-      <div class="section-header">
-        <h2>Jewelry</h2>
-        <span class="section-count">1 piece</span>
-      </div>
-      <div class="product-grid">
-        <div class="product-card" onclick="openLightbox(this)"
-      data-name="Crescent Moon Ceramic Pendant"
-      data-images='[&quot;images/gphoto_3.jpg&quot;]'
-      data-price='<span class="price-current">$42.00</span>'
-      data-sub='necklace'
-      data-desc='Statement ceramic crescent necklace with textured earth-tone glaze on a gold chain. Each piece is hand-shaped with a unique organic pattern.'
-      data-materials='Stoneware clay, gold-plated chain, gold ring clasp'
-      data-dimensions=''
-      data-payment=''>
-      <div class="card-img-wrap">
-        <img src="images/gphoto_3.jpg" alt="Crescent Moon Ceramic Pendant" class="card-img" loading="lazy">
-        
-      </div>
-      <div class="card-body">
-        <h3 class="card-title">Crescent Moon Ceramic Pendant</h3>
-        <span class="card-sub">necklace</span>
-        <div class="card-price"><span class="price-current">$42.00</span></div>
-        <a href="#" class="btn btn-buy" onclick="event.stopPropagation();alert('Payment coming soon! Contact us to purchase.')">Buy Now</a>
-      </div>
-    </div>
-      </div>
-    </div>
-  </section>
-  <section class="section" id="pottery">
-    <div class="container">
-      <div class="section-header">
-        <h2>Pottery</h2>
-        <span class="section-count">3 pieces</span>
-      </div>
-      <div class="product-grid">
-        <div class="product-card" onclick="openLightbox(this)"
-      data-name="Portrait Plate - Woman with Earrings"
-      data-images='[&quot;images/gphoto_9.jpg&quot;, &quot;images/gphoto_10.jpg&quot;]'
-      data-price='<span class="price-current">$95.00</span>'
-      data-sub='plate'
-      data-desc='Hand-painted portrait on an organic-edged ceramic plate. Features a woman with bold earrings and flowing lines in blue and black on speckled stoneware. Each plate is one-of-a-kind, inspired by South Asian feminine strength.'
-      data-materials='Speckled stoneware, hand-painted underglaze'
-      data-dimensions='8'
-      data-payment=''>
-      <div class="card-img-wrap">
-        <img src="images/gphoto_9.jpg" alt="Portrait Plate - Woman with Earrings" class="card-img" loading="lazy">
-        
-      </div>
-      <div class="card-body">
-        <h3 class="card-title">Portrait Plate - Woman with Earrings</h3>
-        <span class="card-sub">plate</span>
-        <div class="card-price"><span class="price-current">$95.00</span></div>
-        <a href="#" class="btn btn-buy" onclick="event.stopPropagation();alert('Payment coming soon! Contact us to purchase.')">Buy Now</a>
-      </div>
-    </div>
-<div class="product-card" onclick="openLightbox(this)"
-      data-name="Mandala Lace Ceramic Plate"
-      data-images='[&quot;images/gphoto_5.jpg&quot;, &quot;images/gphoto_4.jpg&quot;]'
-      data-price='<span class="price-current">$85.00</span>'
-      data-sub='plate'
-      data-desc='Intricate mandala pattern pressed from vintage lace into clay, with a stunning blue-metallic glaze. Scalloped flower-shaped edges make each piece a work of art. Inspired by traditional South Asian textile patterns.'
-      data-materials='Stoneware clay, blue metallic glaze, lace imprint'
-      data-dimensions='9&quot; diameter'
-      data-payment=''>
-      <div class="card-img-wrap">
-        <img src="images/gphoto_5.jpg" alt="Mandala Lace Ceramic Plate" class="card-img" loading="lazy">
-        
-      </div>
-      <div class="card-body">
-        <h3 class="card-title">Mandala Lace Ceramic Plate</h3>
-        <span class="card-sub">plate</span>
-        <div class="card-price"><span class="price-current">$85.00</span></div>
-        <a href="#" class="btn btn-buy" onclick="event.stopPropagation();alert('Payment coming soon! Contact us to purchase.')">Buy Now</a>
-      </div>
-    </div>
-<div class="product-card" onclick="openLightbox(this)"
-      data-name="Lotus Leaf Serving Plate"
-      data-images='[&quot;images/gphoto_2.jpg&quot;]'
-      data-price='<span class="price-current">$68.00</span>'
-      data-sub='plate'
-      data-desc='Hand-formed ceramic plate shaped like a lotus leaf with delicate vein details. Beautiful green glaze with natural organic edges. Perfect as a serving plate or decorative piece.'
-      data-materials='Stoneware clay, green glaze'
-      data-dimensions='10&quot; wide'
-      data-payment=''>
-      <div class="card-img-wrap">
-        <img src="images/gphoto_2.jpg" alt="Lotus Leaf Serving Plate" class="card-img" loading="lazy">
-        
-      </div>
-      <div class="card-body">
-        <h3 class="card-title">Lotus Leaf Serving Plate</h3>
-        <span class="card-sub">plate</span>
-        <div class="card-price"><span class="price-current">$68.00</span></div>
-        <a href="#" class="btn btn-buy" onclick="event.stopPropagation();alert('Payment coming soon! Contact us to purchase.')">Buy Now</a>
-      </div>
-    </div>
-      </div>
-    </div>
-  </section>
-  <section class="section" id="home-decor">
-    <div class="container">
-      <div class="section-header">
-        <h2>Home Decor</h2>
-        <span class="section-count">2 pieces</span>
-      </div>
-      <div class="product-grid">
-        <div class="product-card" onclick="openLightbox(this)"
-      data-name="Cat &amp; Books Clay Magnets Set"
-      data-images='[&quot;images/gphoto_7.jpg&quot;]'
-      data-price='<span class="price-current">$24.00</span>'
-      data-sub='magnets'
-      data-desc='Whimsical collection of hand-painted clay magnets featuring cats, bookshelves, plants, and cozy scenes. Each magnet is individually shaped and painted. A must-have for cat lovers and book lovers alike.'
-      data-materials='Polymer clay, hand-painted, magnetic backing'
-      data-dimensions=''
-      data-payment=''>
-      <div class="card-img-wrap">
-        <img src="images/gphoto_7.jpg" alt="Cat & Books Clay Magnets Set" class="card-img" loading="lazy">
-        
-      </div>
-      <div class="card-body">
-        <h3 class="card-title">Cat & Books Clay Magnets Set</h3>
-        <span class="card-sub">magnets</span>
-        <div class="card-price"><span class="price-current">$24.00</span></div>
-        <a href="#" class="btn btn-buy" onclick="event.stopPropagation();alert('Payment coming soon! Contact us to purchase.')">Buy Now</a>
-      </div>
-    </div>
-<div class="product-card" onclick="openLightbox(this)"
-      data-name="Puppy Love Clay Magnets Set"
-      data-images='[&quot;images/gphoto_6.jpg&quot;]'
-      data-price='<span class="price-current">$24.00</span>'
-      data-sub='magnets'
-      data-desc='Adorable hand-shaped and hand-painted dog magnets in vibrant colors. Each set includes an assortment of playful pup designs - French Bulldogs, Poodles, and more. Perfect gift for dog lovers!'
-      data-materials='Polymer clay, hand-painted, magnetic backing'
-      data-dimensions=''
-      data-payment=''>
-      <div class="card-img-wrap">
-        <img src="images/gphoto_6.jpg" alt="Puppy Love Clay Magnets Set" class="card-img" loading="lazy">
-        
-      </div>
-      <div class="card-body">
-        <h3 class="card-title">Puppy Love Clay Magnets Set</h3>
-        <span class="card-sub">magnets</span>
-        <div class="card-price"><span class="price-current">$24.00</span></div>
-        <a href="#" class="btn btn-buy" onclick="event.stopPropagation();alert('Payment coming soon! Contact us to purchase.')">Buy Now</a>
-      </div>
-    </div>
-      </div>
-    </div>
-  </section>
+    <!-- ══════════ HOME PANEL ══════════ -->
+    <div class="panel panel-home">
+      <div class="hero-photo"></div>
+      <canvas id="waveCanvas"></canvas>
 
-  <!-- STORY BANNER -->
-  <section id="our-story">
-    <div class="container">
-      <div class="story-banner">
-        <div class="story-photo">
-          <img src="images/gphoto_8.jpg" alt="Hand-painting a ceramic portrait plate in the Belle Vie Studios workshop" loading="lazy">
+      <div class="hero-content">
+        <img src="images/logo-t.png" alt="Belle Vie Studios" class="hero-logo">
+
+        <p class="hero-sub">Pottery · Jewelry · Home Decor</p>
+        <button class="browse-btn" onclick="openDrawer()">Browse Collection</button>
+      </div>
+
+      <div class="swipe-up-cue" id="swipeCue">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M9 14V4M9 4L4.5 8.5M9 4L13.5 8.5" stroke="rgba(255,255,255,0.45)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        swipe up to browse
+      </div>
+
+      <!-- Collections drawer -->
+      <div class="drawer" id="drawer">
+        <div class="drawer-bar">
+          <button class="drawer-close" onclick="closeDrawer()">↓</button>
+          <span class="drawer-label">Collection</span>
         </div>
-        <div class="story-text">
-          <h2>The Beautiful Life, by Hand</h2>
-          <p><em>Belle Vie</em> means &ldquo;beautiful life&rdquo; &mdash; and that is what every piece is made to bring into your world.</p>
-          <p>Rooted in the craft traditions of South Asia and committed to leaving a lighter footprint, we turn reclaimed materials into wearable art and functional beauty.</p>
+        <div class="cat-tabs">
+          <button class="cat-tab active" onclick="filterCat('all',this)">All</button>
+          <button class="cat-tab" onclick="filterCat('jewelry',this)">Jewelry</button>
+          <button class="cat-tab" onclick="filterCat('pottery',this)">Pottery</button>
+          <button class="cat-tab" onclick="filterCat('home-decor',this)">Home Decor</button>
+          <button class="cat-tab junior-tab" onclick="filterCat('junior',this)">✨ BV Junior</button>
         </div>
-        <div class="story-values">
-          <div class="story-value">
-            <span class="story-value-icon">&#x267B;</span>
-            <div>
-              <h3>Upcycled Materials</h3>
-              <p>Reclaimed brass, fabric scraps, and salvaged clay find new life in every piece we create.</p>
-            </div>
-          </div>
-          <div class="story-value">
-            <span class="story-value-icon">&#x1F58C;</span>
-            <div>
-              <h3>South Asian Craft</h3>
-              <p>Techniques passed through generations &mdash; from raku firing to hand-hammered metalwork.</p>
-            </div>
-          </div>
-          <div class="story-value">
-            <span class="story-value-icon">&#x1F331;</span>
-            <div>
-              <h3>Zero Waste Studio</h3>
-              <p>Every offcut, every glaze drip, every scrap gets reused. Nothing goes to landfill.</p>
-            </div>
-          </div>
+        <div class="products-scroll" id="productsScroll">
+          <div class="product-grid" id="productGrid"></div>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- SOCIAL -->
-  <section class="social-strip">
-    <p>Follow the studio journey on <em>Instagram</em></p>
-    <a href="https://www.instagram.com/belle.vie.studios_/" target="_blank" rel="noopener" class="ig-link">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-      @belle.vie.studios_
-    </a>
-  </section>
-
-  <!-- LIGHTBOX -->
-  <div class="lightbox-overlay" id="lightbox" onclick="if(event.target===this)closeLightbox()">
-    <div class="lightbox-content">
-      <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
-      <div class="lightbox-img-area">
-        <button class="lightbox-arrow lightbox-prev" id="lbPrev" onclick="lbNav(-1)">&#8249;</button>
-        <img id="lbImg" src="" alt="">
-        <button class="lightbox-arrow lightbox-next" id="lbNext" onclick="lbNav(1)">&#8250;</button>
-        <div class="lightbox-dots" id="lbDots"></div>
+    <!-- ══════════ BV JUNIOR PANEL ══════════ -->
+    <div class="panel panel-junior">
+      <div class="junior-hero">
+        <div class="junior-pill">✨ BV Junior</div>
+        <h1 class="junior-name">Belle Vie<br><em>Junior</em></h1>
+        <p class="junior-blurb">Playful, bright pieces made with the same love — joy for little ones and the young at heart.</p>
       </div>
-      <div class="lightbox-info">
-        <h2 id="lbName"></h2>
-        <div class="lightbox-sub" id="lbSub"></div>
-        <div class="lightbox-price" id="lbPrice"></div>
-        <p class="lightbox-desc" id="lbDesc"></p>
-        <div class="lightbox-meta" id="lbMeta"></div>
-        <a class="btn-buy-lb hidden" id="lbBuy" href="#" target="_blank" rel="noopener">Buy Now</a>
+      <div class="junior-products">
+        <div class="junior-grid" id="juniorGrid"></div>
       </div>
+      <div class="jr-swipe-label">← SWIPE LEFT FOR HOME</div>
     </div>
+
+  </div><!-- /.h-track -->
+
+  <!-- Panel dots -->
+  <div class="panel-dots">
+    <div class="dot" onclick="goPanel(0)"></div>
+    <div class="dot active" onclick="goPanel(1)"></div>
+    <div class="dot" onclick="goPanel(2)"></div>
   </div>
 
-  <style>
-    .lightbox-overlay {
-      display: none; position: fixed; inset: 0; z-index: 1000;
-      background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
-      align-items: center; justify-content: center; padding: 20px;
-    }
-    .lightbox-overlay.active { display: flex; }
-    .lightbox-content {
-      background: var(--surface); border-radius: var(--radius-lg);
-      max-width: 800px; width: 100%; max-height: 92vh;
-      overflow-y: auto; position: relative;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-      animation: lbIn 0.3s ease;
-    }
-    @keyframes lbIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
-    .lightbox-close {
-      position: absolute; top: 12px; right: 14px; z-index: 10;
-      background: rgba(0,0,0,0.5); color: #fff; border: none;
-      width: 36px; height: 36px; border-radius: 50%;
-      font-size: 1.4rem; cursor: pointer; display: flex;
-      align-items: center; justify-content: center;
-      transition: background 0.2s;
-    }
-    .lightbox-close:hover { background: rgba(0,0,0,0.8); }
-    .lightbox-img-area {
-      position: relative; background: var(--bg-alt);
-      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-      overflow: hidden;
-    }
-    #lbImg {
-      width: 100%; max-height: 500px; object-fit: contain;
-      display: block;
-    }
-    .lightbox-arrow {
-      position: absolute; top: 50%; transform: translateY(-50%);
-      background: rgba(255,255,255,0.85); border: none;
-      width: 40px; height: 40px; border-radius: 50%;
-      font-size: 1.6rem; cursor: pointer; color: var(--text);
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: var(--shadow-md); transition: 0.2s;
-    }
-    .lightbox-arrow:hover { background: #fff; }
-    .lightbox-prev { left: 12px; }
-    .lightbox-next { right: 12px; }
-    .lightbox-arrow.hidden { display: none; }
-    .lightbox-dots {
-      position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
-      display: flex; gap: 6px;
-    }
-    .lightbox-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: rgba(255,255,255,0.5); cursor: pointer;
-      transition: 0.2s;
-    }
-    .lightbox-dot.active { background: #fff; transform: scale(1.3); }
-    .lightbox-info { padding: 24px; }
-    .lightbox-info h2 {
-      font-family: var(--serif); font-size: 1.5rem; font-weight: 700;
-      margin-bottom: 4px;
-    }
-    .lightbox-sub {
-      font-size: 0.8rem; color: var(--text-faint); text-transform: uppercase;
-      letter-spacing: 0.1em; margin-bottom: 12px;
-    }
-    .lightbox-price { font-size: 1.2rem; font-weight: 700; margin-bottom: 16px; }
-    .lightbox-price .price-original { text-decoration: line-through; color: var(--text-faint); font-weight: 400; font-size: 1rem; margin-right: 8px; }
-    .lightbox-price .price-sale { color: var(--red); }
-    .lightbox-desc {
-      font-size: 0.95rem; color: var(--text-mid); line-height: 1.7;
-      margin-bottom: 16px;
-    }
-    .lightbox-meta {
-      font-size: 0.82rem; color: var(--text-faint); line-height: 1.6;
-    }
-    .lightbox-meta span { display: block; }
-    .btn-buy-lb {
-      display: inline-block; margin-top: 16px; padding: 12px 32px;
-      background: var(--clay); color: #fff; border-radius: 999px;
-      font-weight: 600; font-size: 1rem; text-decoration: none;
-      text-align: center; transition: background 0.2s;
-    }
-    .btn-buy-lb:hover { background: var(--clay-deep); }
-    .btn-buy-lb.hidden { display: none; }
-    @media (max-width: 600px) {
-      .lightbox-content { max-height: 95vh; border-radius: 12px; }
-      #lbImg { max-height: 320px; }
-      .lightbox-info { padding: 16px; }
-      .lightbox-info h2 { font-size: 1.2rem; }
-      .lightbox-arrow { width: 32px; height: 32px; font-size: 1.2rem; }
-    }
-  </style>
+</div><!-- /.app -->
 
-  <script>
-    let lbImages = [], lbIdx = 0;
-    function openLightbox(el) {
-      const images = JSON.parse(el.dataset.images || '[]');
-      if (!images.length) return;
-      lbImages = images;
-      lbIdx = 0;
-      document.getElementById('lbName').textContent = el.dataset.name || '';
-      document.getElementById('lbSub').textContent = el.dataset.sub || '';
-      document.getElementById('lbPrice').innerHTML = el.dataset.price || '';
-      document.getElementById('lbDesc').textContent = el.dataset.desc || '';
-      let meta = '';
-      if (el.dataset.materials) meta += '<span><strong>Materials:</strong> ' + el.dataset.materials + '</span>';
-      if (el.dataset.dimensions) meta += '<span><strong>Dimensions:</strong> ' + el.dataset.dimensions + '</span>';
-      document.getElementById('lbMeta').innerHTML = meta;
-      var buyBtn = document.getElementById('lbBuy');
-      if (el.dataset.payment) {
-        buyBtn.href = el.dataset.payment; buyBtn.onclick = null; buyBtn.classList.remove('hidden');
-      } else if (el.dataset.price) {
-        buyBtn.href = '#'; buyBtn.onclick = function(e) { e.preventDefault(); alert('Payment coming soon! Contact us to purchase.'); };
-        buyBtn.classList.remove('hidden');
-      } else { buyBtn.classList.add('hidden'); }
-      updateLbImg();
-      document.getElementById('lightbox').classList.add('active');
-      document.body.style.overflow = 'hidden';
+<!-- LIGHTBOX -->
+<div class="lightbox-overlay" id="lightbox" onclick="if(event.target===this)closeLightbox()">
+  <button class="lb-close" onclick="closeLightbox()">✕</button>
+  <div class="lb-sheet">
+    <div class="lb-drag-handle"></div>
+    <div class="lb-img-area">
+      <img class="lb-img" id="lbImg" src="" alt="">
+      <button class="lb-arrow prev hidden" id="lbPrev" onclick="lbNav(-1)">‹</button>
+      <button class="lb-arrow next hidden" id="lbNext" onclick="lbNav(1)">›</button>
+      <div class="lb-dots" id="lbDots"></div>
+    </div>
+    <div class="lb-info">
+      <div class="lb-name" id="lbName"></div>
+      <span class="lb-sub" id="lbSub"></span>
+      <div class="lb-price" id="lbPrice"></div>
+      <p class="lb-desc" id="lbDesc"></p>
+      <div class="lb-meta" id="lbMeta"></div>
+      <button class="lb-buy" id="lbBuy">Buy Now</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── PRODUCTS ── */
+const PRODUCTS = [
+  { id:'p1', cat:'jewelry',
+    name:'Crescent Moon Ceramic Pendant', sub:'necklace',
+    images:['images/gphoto_3.jpg'], price:'$42.00',
+    desc:'Statement ceramic crescent necklace with textured earth-tone glaze on a gold chain. Each piece is hand-shaped with a unique organic pattern.',
+    materials:'Stoneware clay, gold-plated chain, gold ring clasp', dimensions:'' },
+  { id:'p2', cat:'pottery',
+    name:'Portrait Plate — Woman with Earrings', sub:'plate',
+    images:['images/gphoto_9.jpg','images/gphoto_10.jpg'], price:'$95.00',
+    desc:'Hand-painted portrait on an organic-edged ceramic plate. A woman with bold earrings, flowing lines in blue and black on speckled stoneware. Every piece is one-of-a-kind.',
+    materials:'Speckled stoneware, hand-painted underglaze', dimensions:'8"' },
+  { id:'p3', cat:'pottery',
+    name:'Mandala Lace Ceramic Plate', sub:'plate',
+    images:['images/gphoto_5.jpg','images/gphoto_4.jpg'], price:'$85.00',
+    desc:'Intricate mandala pattern pressed from vintage lace into clay with a stunning blue-metallic glaze. Scalloped flower-shaped edges.',
+    materials:'Stoneware clay, blue metallic glaze, lace imprint', dimensions:'9" diameter' },
+  { id:'p4', cat:'pottery',
+    name:'Lotus Leaf Serving Plate', sub:'plate',
+    images:['images/gphoto_2.jpg'], price:'$68.00',
+    desc:'Hand-formed ceramic plate shaped like a lotus leaf with delicate vein details. Beautiful green glaze with natural organic edges.',
+    materials:'Stoneware clay, green glaze', dimensions:'10" wide' },
+  { id:'p5', cat:'home-decor',
+    name:'Cat & Books Clay Magnets Set', sub:'magnets',
+    images:['images/gphoto_7.jpg'], price:'$24.00',
+    desc:'Whimsical hand-painted clay magnets — cats, bookshelves, plants, and cozy scenes. Each one individually shaped and painted.',
+    materials:'Polymer clay, hand-painted, magnetic backing', dimensions:'' },
+  { id:'p6', cat:'home-decor',
+    name:'Puppy Love Clay Magnets Set', sub:'magnets',
+    images:['images/gphoto_6.jpg'], price:'$24.00',
+    desc:'Adorable hand-shaped and painted dog magnets in vibrant colors. French Bulldogs, Poodles and more.',
+    materials:'Polymer clay, hand-painted, magnetic backing', dimensions:'' },
+  { id:'j1', cat:'junior',
+    name:'Puppy Love Clay Magnets', sub:'magnets · junior',
+    images:['images/gphoto_6.jpg'], price:'$24.00',
+    desc:'Adorable hand-painted dog magnets — perfect first art piece for little ones!',
+    materials:'Polymer clay, hand-painted, magnetic backing', dimensions:'' },
+  { id:'j2', cat:'junior',
+    name:'Cat & Books Clay Magnets', sub:'magnets · junior',
+    images:['images/gphoto_7.jpg'], price:'$24.00',
+    desc:'Whimsical cats, bookshelves, and cozy scenes hand-shaped from clay. A must-have for young book and cat lovers!',
+    materials:'Polymer clay, hand-painted, magnetic backing', dimensions:'' },
+];
+
+/* ── RENDER ── */
+function cardHTML(p, jr) {
+  return `<div class="product-card${jr?' junior-card':''}" onclick="openLightbox('${p.id}')">
+    <div class="card-img-wrap"><img src="${p.images[0]}" alt="${p.name}" class="card-img" loading="lazy"></div>
+    <div class="card-body">
+      <div class="card-title">${p.name}</div>
+      <span class="card-sub">${p.sub}</span>
+      <div class="card-price${jr?' jr':''}">${p.price}</div>
+    </div>
+  </div>`;
+}
+
+function renderGrid(id, list, jr) {
+  document.getElementById(id).innerHTML = list.map(p => cardHTML(p, jr)).join('');
+}
+
+renderGrid('productGrid', PRODUCTS, false);
+renderGrid('juniorGrid', PRODUCTS.filter(p => p.cat==='junior'), true);
+
+/* ── FILTER ── */
+function filterCat(cat, btn) {
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const list = cat==='all' ? PRODUCTS : PRODUCTS.filter(p => p.cat===cat);
+  renderGrid('productGrid', list, cat==='junior');
+  document.getElementById('productsScroll').scrollTop = 0;
+}
+
+/* ── DRAWER ── */
+const drawer = document.getElementById('drawer');
+const swipeCue = document.getElementById('swipeCue');
+function openDrawer()  { drawer.classList.add('open'); swipeCue.style.opacity='0'; }
+function closeDrawer() { drawer.classList.remove('open'); swipeCue.style.opacity='1'; }
+
+/* ── PANEL NAV ── */
+const hTrack = document.getElementById('hTrack');
+let curPanel = 1;
+
+function goPanel(n) {
+  curPanel = Math.max(0, Math.min(2, n));
+  hTrack.style.transform = `translateX(${-curPanel * 33.333}%)`;
+  document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i===curPanel));
+}
+
+/* ── TOUCH GESTURES ── */
+let tx0 = null, ty0 = null;
+
+document.addEventListener('touchstart', e => {
+  if (document.getElementById('lightbox').classList.contains('active')) return;
+  tx0 = e.touches[0].clientX;
+  ty0 = e.touches[0].clientY;
+}, { passive: true });
+
+document.addEventListener('touchend', e => {
+  if (tx0 === null) return;
+  // Skip if touch is inside products scroll or junior panel scroll
+  if (e.target.closest('.products-scroll') || e.target.closest('.panel-junior')) {
+    tx0 = null; return;
+  }
+  const dx = e.changedTouches[0].clientX - tx0;
+  const dy = e.changedTouches[0].clientY - ty0;
+  const adx = Math.abs(dx), ady = Math.abs(dy);
+
+  if (drawer.classList.contains('open')) {
+    // Pull down to close drawer
+    if (dy > 72 && ady > adx * 1.2) closeDrawer();
+    tx0 = null; return;
+  }
+
+  // Swipe UP on home panel → open drawer
+  if (curPanel === 1 && dy < -60 && ady > adx * 1.2) {
+    openDrawer(); tx0 = null; return;
+  }
+
+  // Horizontal panel swipe
+  if (adx > 55 && adx > ady * 1.2) {
+    if (dx < 0) goPanel(curPanel + 1);
+    else         goPanel(curPanel - 1);
+  }
+  tx0 = null;
+}, { passive: true });
+
+/* ── LIGHTBOX ── */
+let lbImgs = [], lbI = 0;
+function openLightbox(id) {
+  const p = PRODUCTS.find(x => x.id===id);
+  if (!p) return;
+  lbImgs = p.images; lbI = 0;
+  document.getElementById('lbName').textContent = p.name;
+  document.getElementById('lbSub').textContent = p.sub;
+  document.getElementById('lbPrice').textContent = p.price;
+  document.getElementById('lbDesc').textContent = p.desc;
+  let m = '';
+  if (p.materials) m += `<span><strong>Materials:</strong> ${p.materials}</span>`;
+  if (p.dimensions) m += `<span><strong>Size:</strong> ${p.dimensions}</span>`;
+  document.getElementById('lbMeta').innerHTML = m;
+  document.getElementById('lbBuy').onclick = () => alert('Payment coming soon — contact us to purchase!');
+  updateLbImg();
+  document.getElementById('lightbox').classList.add('active');
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('active'); }
+function lbNav(dir) { lbI = (lbI + dir + lbImgs.length) % lbImgs.length; updateLbImg(); }
+function updateLbImg() {
+  document.getElementById('lbImg').src = lbImgs[lbI];
+  const multi = lbImgs.length > 1;
+  document.getElementById('lbPrev').classList.toggle('hidden', !multi);
+  document.getElementById('lbNext').classList.toggle('hidden', !multi);
+  document.getElementById('lbDots').innerHTML = multi
+    ? lbImgs.map((_,i) => `<span class="lb-dot${i===lbI?' active':''}" onclick="lbI=${i};updateLbImg()"></span>`).join('')
+    : '';
+}
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lightbox').classList.contains('active')) return;
+  if (e.key==='Escape') closeLightbox();
+  if (e.key==='ArrowLeft') lbNav(-1);
+  if (e.key==='ArrowRight') lbNav(1);
+});
+
+/* ── WAVE GLITTER CANVAS ── */
+(function() {
+  const canvas = document.getElementById('waveCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, tick = 0;
+
+  function resize() {
+    W = canvas.width = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  /* Particles */
+  const N = 110;
+  const particles = [];
+
+  function spawn(scattered) {
+    const p = {
+      bx: Math.random() * W,       // base x
+      y:  scattered ? Math.random() * H : H + 10 + Math.random() * 80,
+      vy: 0.22 + Math.random() * 0.42,   // rise speed
+      wA: 18 + Math.random() * 38,       // wave amplitude (horiz drift)
+      wF: 0.0018 + Math.random() * 0.004, // wave frequency
+      wP: Math.random() * Math.PI * 2,   // wave phase
+      r:  0.7 + Math.random() * 2.2,     // star radius
+      rot: Math.random() * Math.PI * 2,
+      rV: (Math.random() - 0.5) * 0.035,
+      life: 0,
+      maxLife: 220 + Math.random() * 280,
+      col: Math.random() > 0.65 ? '#FFFFFF'
+         : Math.random() > 0.45 ? '#E8C030'
+         : '#C8960C',
+    };
+    if (scattered) p.life = Math.random() * p.maxLife;
+    return p;
+  }
+
+  for (let i = 0; i < N; i++) particles.push(spawn(true));
+
+  /* 4-pointed star */
+  function star(x, y, r, rot, alpha, col) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(x, y);
+    ctx.rotate(rot);
+    ctx.fillStyle = col;
+    ctx.beginPath();
+    for (let i = 0; i < 4; i++) {
+      const a = (i * Math.PI) / 2;
+      const b = a + Math.PI / 4;
+      if (i === 0) ctx.moveTo(Math.cos(a)*r*3.2, Math.sin(a)*r*3.2);
+      else         ctx.lineTo(Math.cos(a)*r*3.2, Math.sin(a)*r*3.2);
+      ctx.lineTo(Math.cos(b)*r, Math.sin(b)*r);
     }
-    function closeLightbox() {
-      document.getElementById('lightbox').classList.remove('active');
-      document.body.style.overflow = '';
-    }
-    function lbNav(dir) {
-      lbIdx = (lbIdx + dir + lbImages.length) % lbImages.length;
-      updateLbImg();
-    }
-    function updateLbImg() {
-      document.getElementById('lbImg').src = lbImages[lbIdx];
-      const prev = document.getElementById('lbPrev');
-      const next = document.getElementById('lbNext');
-      if (lbImages.length <= 1) {
-        prev.classList.add('hidden');
-        next.classList.add('hidden');
-      } else {
-        prev.classList.remove('hidden');
-        next.classList.remove('hidden');
+    ctx.closePath();
+    ctx.fill();
+    /* glow center dot */
+    ctx.beginPath();
+    ctx.arc(0, 0, r*0.55, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.fill();
+    ctx.restore();
+  }
+
+  /* Flowing wave bands — very subtle, give the "ocean of light" feel */
+  function waveBands() {
+    const bands = [
+      { y: H * 0.28, amp: H * 0.055, freq: 0.007,  spd: 0.25, col: 'rgba(200,150,12,0.055)', lw: 80 },
+      { y: H * 0.52, amp: H * 0.038, freq: 0.011,  spd: 0.18, col: 'rgba(232,192,48,0.045)', lw: 70 },
+      { y: H * 0.74, amp: H * 0.07,  freq: 0.0055, spd: 0.13, col: 'rgba(200,150,12,0.04)',  lw: 90 },
+    ];
+    bands.forEach(b => {
+      ctx.beginPath();
+      for (let x = 0; x <= W; x += 3) {
+        const y = b.y + Math.sin(x * b.freq + tick * b.spd) * b.amp;
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
       }
-      // Dots
-      const dots = document.getElementById('lbDots');
-      if (lbImages.length > 1) {
-        dots.innerHTML = lbImages.map((_, i) =>
-          '<span class="lightbox-dot' + (i === lbIdx ? ' active' : '') + '" onclick="lbIdx=' + i + ';updateLbImg()"></span>'
-        ).join('');
-      } else {
-        dots.innerHTML = '';
-      }
-    }
-    document.addEventListener('keydown', e => {
-      if (!document.getElementById('lightbox').classList.contains('active')) return;
-      if (e.key === 'Escape') closeLightbox();
-      if (e.key === 'ArrowLeft') lbNav(-1);
-      if (e.key === 'ArrowRight') lbNav(1);
+      ctx.strokeStyle = b.col;
+      ctx.lineWidth = b.lw;
+      ctx.stroke();
     });
-  </script>
+  }
 
-  <!-- FOOTER -->
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <div>
-        <div class="footer-brand">Belle Vie Studios</div>
-        <p class="footer-desc">Handcrafted pottery, jewelry, and home decor. Each piece made with intention, rooted in South Asian craft traditions.</p>
-      </div>
-      <div class="footer-links">
-        <div class="footer-col">
-          <h4>Collections</h4>
-          <a href="#jewelry">Jewelry</a>
-<a href="#pottery">Pottery</a>
-<a href="#home-decor">Home Decor</a>
-        </div>
-        <div class="footer-col">
-          <h4>Connect</h4>
-          <a href="https://www.instagram.com/belle.vie.studios_/" target="_blank" rel="noopener">Instagram</a>
-          <a href="mailto:hello@belleviestudios.com">Email</a>
-        </div>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      &copy; <span id="footerYear"></span> Belle Vie Studios
-    </div>
-  </footer>
-  <script>document.getElementById('footerYear').textContent = new Date().getFullYear();</script>
+  function frame() {
+    ctx.clearRect(0, 0, W, H);
+    tick++;
 
+    waveBands();
+
+    particles.forEach((p, i) => {
+      p.life++;
+      p.y  -= p.vy;
+      p.rot += p.rV;
+      const x = p.bx + Math.sin(p.wP + tick * p.wF * 55) * p.wA;
+
+      const prog  = p.life / p.maxLife;
+      const alpha = prog < 0.15  ? prog / 0.15
+                  : prog > 0.78  ? (1 - prog) / 0.22
+                  : 1;
+
+      star(x, p.y, p.r, p.rot, alpha * 0.62, p.col);
+
+      if (p.y < -20 || p.life >= p.maxLife) particles[i] = spawn(false);
+    });
+
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+</script>
 </body>
 </html>
