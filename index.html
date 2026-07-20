@@ -197,19 +197,49 @@
     }
     .browse-btn:active { background: rgba(200,150,12,0.2); }
 
-    .swipe-up-cue {
-      position: absolute; bottom: calc(env(safe-area-inset-bottom, 0px) + 44px);
-      left: 50%; transform: translateX(-50%);
-      display: flex; flex-direction: column; align-items: center; gap: 6px;
-      z-index: 4; color: rgba(255,255,255,0.4);
-      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+    /* ── BROWSE TAB ── */
+    .browse-tab {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      z-index: 5;
+      display: flex; flex-direction: column; align-items: center;
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
       transition: opacity 0.3s;
+      cursor: pointer;
     }
-    .swipe-up-cue svg { animation: floatUp 2.2s ease-in-out infinite; }
-    @keyframes floatUp {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-7px); }
+    .browse-tab-handle {
+      width: 48px; height: 5px; background: rgba(255,255,255,0.35);
+      border-radius: 3px; margin-bottom: 10px;
     }
+    .browse-tab-pill {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.18);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1.5px solid rgba(255,255,255,0.45);
+      border-radius: 40px;
+      padding: 14px 28px;
+      color: #fff;
+      font-family: var(--ui); font-size: 1rem; font-weight: 400;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+      transition: background 0.2s, transform 0.15s;
+    }
+    .browse-tab:active .browse-tab-pill {
+      background: rgba(200,150,12,0.3);
+      transform: scale(0.97);
+    }
+    .browse-arrow {
+      display: flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px;
+      background: var(--gold); border-radius: 50%;
+      animation: pulseUp 1.8s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    @keyframes pulseUp {
+      0%, 100% { transform: translateY(0); box-shadow: 0 0 0 0 rgba(200,150,12,0.5); }
+      50%       { transform: translateY(-4px); box-shadow: 0 6px 16px rgba(200,150,12,0.4); }
+    }
+    .swipe-up-cue { display: none; } /* replaced by browse-tab */
 
     /* ─── COLLECTIONS DRAWER ─── */
     .drawer {
@@ -403,18 +433,23 @@
         <img src="images/logo-t.png" alt="Belle Vie Studios" class="hero-logo">
 
         <p class="hero-sub">Pottery · Jewelry · Home Decor</p>
-        <button class="browse-btn" onclick="openDrawer()">Browse Collection</button>
       </div>
 
       <!-- Side nav arrows on home panel -->
       <button class="panel-arrow left" onclick="goPanel(0)" title="Instagram" style="left:0">‹</button>
       <button class="panel-arrow right" onclick="goPanel(2)" title="BV Junior" style="right:0">›</button>
 
-      <div class="swipe-up-cue" id="swipeCue">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <path d="M9 14V4M9 4L4.5 8.5M9 4L13.5 8.5" stroke="rgba(255,255,255,0.45)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        swipe up to browse
+      <!-- Obvious browse tab fixed at bottom -->
+      <div class="browse-tab" id="browseTab" onclick="openDrawer()">
+        <div class="browse-tab-handle"></div>
+        <div class="browse-tab-pill">
+          <div class="browse-arrow">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M7 11V3M7 3L3 7M7 3L11 7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          Browse Collection
+        </div>
       </div>
 
       <!-- Collections drawer -->
@@ -558,9 +593,9 @@ function filterCat(cat, btn) {
 
 /* ── DRAWER ── */
 const drawer = document.getElementById('drawer');
-const swipeCue = document.getElementById('swipeCue');
-function openDrawer()  { drawer.classList.add('open'); swipeCue.style.opacity='0'; }
-function closeDrawer() { drawer.classList.remove('open'); swipeCue.style.opacity='1'; }
+const browseTab = document.getElementById('browseTab');
+function openDrawer()  { drawer.classList.add('open'); browseTab.style.opacity='0'; browseTab.style.pointerEvents='none'; }
+function closeDrawer() { drawer.classList.remove('open'); browseTab.style.opacity='1'; browseTab.style.pointerEvents=''; }
 
 /* ── PANEL NAV ── */
 const hTrack = document.getElementById('hTrack');
