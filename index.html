@@ -131,6 +131,46 @@
     }
     .panel-arrow:hover { background: rgba(255,255,255,0.22); }
 
+    /* ── DESKTOP TOP NAV ── */
+    .desktop-nav {
+      display: none;
+    }
+    @media (min-width: 768px) {
+      .desktop-nav {
+        display: flex;
+        position: fixed; top: 0; left: 0; right: 0;
+        z-index: 999;
+        align-items: center; justify-content: center;
+        gap: 6px;
+        padding: 12px 24px;
+        background: rgba(0,0,0,0.45);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+      }
+      .desktop-nav-btn {
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.18);
+        color: rgba(255,255,255,0.7);
+        border-radius: 24px;
+        padding: 8px 24px;
+        font-family: var(--ui); font-size: 0.9rem; font-weight: 400;
+        letter-spacing: 0.1em;
+        cursor: pointer; transition: all 0.2s;
+      }
+      .desktop-nav-btn:hover { background: rgba(255,255,255,0.18); color: #fff; }
+      .desktop-nav-btn.active {
+        background: var(--gold);
+        border-color: var(--gold);
+        color: #fff;
+      }
+      .desktop-nav-btn.junior-nav.active {
+        background: var(--rose); border-color: var(--rose);
+      }
+      /* push hero content down on desktop to clear the nav bar */
+      .hero-content { padding-top: max(14vh, 80px); }
+    }
+
     /* ─────────────────────────────────────────
        HOME PANEL (center)
     ───────────────────────────────────────── */
@@ -399,6 +439,13 @@
 </head>
 <body>
 
+<!-- Desktop top navigation (hidden on mobile) -->
+<nav class="desktop-nav" id="desktopNav">
+  <button class="desktop-nav-btn" id="dnIG"     onclick="goPanel(0)">Instagram</button>
+  <button class="desktop-nav-btn active" id="dnHome" onclick="goPanel(1)">Home</button>
+  <button class="desktop-nav-btn junior-nav" id="dnJr" onclick="goPanel(2)">✨ BV Junior</button>
+</nav>
+
 <div class="app">
 
   <!-- HORIZONTAL PANEL TRACK -->
@@ -605,6 +652,9 @@ function goPanel(n) {
   curPanel = Math.max(0, Math.min(2, n));
   hTrack.style.transform = `translateX(${-curPanel * 33.333}%)`;
   document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i===curPanel));
+  // sync desktop nav
+  const dnBtns = [document.getElementById('dnIG'), document.getElementById('dnHome'), document.getElementById('dnJr')];
+  dnBtns.forEach((b,i) => b && b.classList.toggle('active', i===curPanel));
 }
 
 /* ── TOUCH GESTURES ── */
