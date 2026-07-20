@@ -560,8 +560,12 @@
             Home
           </button>
         </div>
-        <div class="cat-tabs" id="catTabs">
-          <button class="cat-tab active" onclick="filterCat('__all__',this)">All</button>
+        <div class="cat-tabs">
+          <button class="cat-tab active" onclick="filterCat('all',this)">All</button>
+          <button class="cat-tab" onclick="filterCat('jewelry',this)">Jewelry</button>
+          <button class="cat-tab" onclick="filterCat('pottery',this)">Pottery</button>
+          <button class="cat-tab" onclick="filterCat('home-decor',this)">Home Decor</button>
+          <button class="cat-tab junior-tab" onclick="filterCat('junior',this)">✨ BV Junior</button>
         </div>
         <div class="products-scroll" id="productsScroll">
           <div class="product-grid" id="productGrid"></div>
@@ -617,105 +621,49 @@
 </div>
 
 <script>
-/* ─────────────────────────────────────────
-   GOOGLE SHEETS INVENTORY
-   ─────────────────────────────────────────
-   Set SHEET_ID to your Google Spreadsheet ID
-   (the long string in the sheet URL between /d/ and /edit)
-   Sheet must be shared: "Anyone with the link can view"
-──────────────────────────────────────────*/
-const SHEET_ID = 'YOUR_GOOGLE_SHEET_ID_HERE';
-const SHEET_CSV = (tab) =>
-  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tab)}`;
-
-let PRODUCTS = [];          // all loaded products
-let COLLECTIONS = [];       // active collection names from _Config
-
-/* ── CSV PARSER ── */
-function parseCsvRows(csv) {
-  const rows = []; let row = [], cell = '', inQ = false;
-  for (let i = 0; i < csv.length; i++) {
-    const c = csv[i];
-    if (c === '"') { if (inQ && csv[i+1]==='"') { cell+='"'; i++; } else inQ=!inQ; }
-    else if (c === ',' && !inQ) { row.push(cell); cell=''; }
-    else if ((c==='\n'||c==='\r') && !inQ) {
-      if (c==='\r'&&csv[i+1]==='\n') i++;
-      row.push(cell); rows.push(row); row=[]; cell='';
-    } else cell+=c;
-  }
-  if (cell||row.length) { row.push(cell); rows.push(row); }
-  return rows.filter(r => r.some(c=>c.trim()));
-}
-
-/* Convert any Google Drive share URL → embeddable image URL */
-function driveImg(url) {
-  if (!url) return '';
-  const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-  return m ? `https://lh3.googleusercontent.com/d/${m[1]}=w600` : url;
-}
-
-/* ── LOAD INVENTORY FROM SHEET ── */
-async function loadInventory() {
-  if (SHEET_ID === 'YOUR_GOOGLE_SHEET_ID_HERE') {
-    showEmptyState('Add your Google Sheet ID to go live.');
-    return;
-  }
-  showEmptyState('Loading…');
-  try {
-    // 1. Read _Config tab
-    const cfgRes  = await fetch(SHEET_CSV('_Config'));
-    const cfgRows = parseCsvRows(await cfgRes.text()).slice(1);
-    COLLECTIONS = cfgRows
-      .filter(r => r[1] && r[1].trim().toLowerCase() === 'yes')
-      .map((r, i) => ({ name: r[0].trim(), order: parseInt(r[2]) || i }))
-      .sort((a, b) => a.order - b.order);
-
-    // 2. Fetch each active collection
-    PRODUCTS = [];
-    await Promise.all(COLLECTIONS.map(async (col) => {
-      try {
-        const res  = await fetch(SHEET_CSV(col.name));
-        const rows = parseCsvRows(await res.text()).slice(1); // skip header row
-        rows
-          .filter(r => r[0] && r[0].trim())                           // must have image
-          .filter(r => (r[4]||'').trim().toLowerCase() !== 'yes')     // not sold
-          .forEach((r, i) => PRODUCTS.push({
-            id:    col.name.replace(/\s+/g,'-').toLowerCase() + '-' + i,
-            cat:   col.name,
-            name:  (r[1]||'').trim() || 'Untitled',
-            price: (r[2]||'').trim(),
-            desc:  (r[3]||'').trim(),
-            images:[driveImg(r[0].trim())],
-            sub:   col.name.toLowerCase(),
-            materials:'', dimensions:''
-          }));
-      } catch(e) { console.warn('Could not load collection:', col.name); }
-    }));
-
-    // 3. Build filter tabs dynamically
-    const tabsEl = document.getElementById('catTabs');
-    tabsEl.innerHTML = `<button class="cat-tab active" onclick="filterCat('__all__',this)">All</button>`;
-    COLLECTIONS.forEach(col => {
-      const jr = col.name === 'BV Junior';
-      tabsEl.innerHTML += `<button class="cat-tab${jr?' junior-tab':''}" onclick="filterCat(${JSON.stringify(col.name)},this)">${jr?'✨ ':''}${col.name}</button>`;
-    });
-
-    // 4. Render grids
-    renderGrid('productGrid', PRODUCTS, false);
-    renderGrid('juniorGrid',  PRODUCTS.filter(p => p.cat === 'BV Junior'), true);
-
-    if (!PRODUCTS.length) showEmptyState('No items yet — check back soon.');
-
-  } catch(err) {
-    console.error(err);
-    showEmptyState('Could not load inventory. Check Sheet ID and sharing settings.');
-  }
-}
-
-function showEmptyState(msg) {
-  document.getElementById('productGrid').innerHTML =
-    `<div style="grid-column:1/-1;padding:32px 0;text-align:center;color:var(--ink-faint);font-size:0.9rem;letter-spacing:0.06em">${msg}</div>`;
-}
+/* ── PRODUCTS ── */
+const PRODUCTS = [
+  { id:'p1', cat:'jewelry',
+    name:'Crescent Moon Ceramic Pendant', sub:'necklace',
+    images:['images/gphoto_3.jpg'], price:'$42.00',
+    desc:'Statement ceramic crescent necklace with textured earth-tone glaze on a gold chain. Each piece is hand-shaped with a unique organic pattern.',
+    materials:'Stoneware clay, gold-plated chain, gold ring clasp', dimensions:'' },
+  { id:'p2', cat:'pottery',
+    name:'Portrait Plate — Woman with Earrings', sub:'plate',
+    images:['images/gphoto_9.jpg','images/gphoto_10.jpg'], price:'$95.00',
+    desc:'Hand-painted portrait on an organic-edged ceramic plate. A woman with bold earrings, flowing lines in blue and black on speckled stoneware. Every piece is one-of-a-kind.',
+    materials:'Speckled stoneware, hand-painted underglaze', dimensions:'8"' },
+  { id:'p3', cat:'pottery',
+    name:'Mandala Lace Ceramic Plate', sub:'plate',
+    images:['images/gphoto_5.jpg','images/gphoto_4.jpg'], price:'$85.00',
+    desc:'Intricate mandala pattern pressed from vintage lace into clay with a stunning blue-metallic glaze. Scalloped flower-shaped edges.',
+    materials:'Stoneware clay, blue metallic glaze, lace imprint', dimensions:'9" diameter' },
+  { id:'p4', cat:'pottery',
+    name:'Lotus Leaf Serving Plate', sub:'plate',
+    images:['images/gphoto_2.jpg'], price:'$68.00',
+    desc:'Hand-formed ceramic plate shaped like a lotus leaf with delicate vein details. Beautiful green glaze with natural organic edges.',
+    materials:'Stoneware clay, green glaze', dimensions:'10" wide' },
+  { id:'p5', cat:'home-decor',
+    name:'Cat & Books Clay Magnets Set', sub:'magnets',
+    images:['images/gphoto_7.jpg'], price:'$24.00',
+    desc:'Whimsical hand-painted clay magnets — cats, bookshelves, plants, and cozy scenes. Each one individually shaped and painted.',
+    materials:'Polymer clay, hand-painted, magnetic backing', dimensions:'' },
+  { id:'p6', cat:'home-decor',
+    name:'Puppy Love Clay Magnets Set', sub:'magnets',
+    images:['images/gphoto_6.jpg'], price:'$24.00',
+    desc:'Adorable hand-shaped and painted dog magnets in vibrant colors. French Bulldogs, Poodles and more.',
+    materials:'Polymer clay, hand-painted, magnetic backing', dimensions:'' },
+  { id:'j1', cat:'junior',
+    name:'Puppy Love Clay Magnets', sub:'magnets · junior',
+    images:['images/gphoto_6.jpg'], price:'$24.00',
+    desc:'Adorable hand-painted dog magnets — perfect first art piece for little ones!',
+    materials:'Polymer clay, hand-painted, magnetic backing', dimensions:'' },
+  { id:'j2', cat:'junior',
+    name:'Cat & Books Clay Magnets', sub:'magnets · junior',
+    images:['images/gphoto_7.jpg'], price:'$24.00',
+    desc:'Whimsical cats, bookshelves, and cozy scenes hand-shaped from clay. A must-have for young book and cat lovers!',
+    materials:'Polymer clay, hand-painted, magnetic backing', dimensions:'' },
+];
 
 /* ── RENDER ── */
 function cardHTML(p, jr) {
@@ -733,17 +681,17 @@ function renderGrid(id, list, jr) {
   document.getElementById(id).innerHTML = list.map(p => cardHTML(p, jr)).join('');
 }
 
+renderGrid('productGrid', PRODUCTS, false);
+renderGrid('juniorGrid', PRODUCTS.filter(p => p.cat==='junior'), true);
+
 /* ── FILTER ── */
 function filterCat(cat, btn) {
   document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
-  const list = cat === '__all__' ? PRODUCTS : PRODUCTS.filter(p => p.cat === cat);
-  const isJr = cat === 'BV Junior';
-  renderGrid('productGrid', list, isJr);
+  const list = cat==='all' ? PRODUCTS : PRODUCTS.filter(p => p.cat===cat);
+  renderGrid('productGrid', list, cat==='junior');
   document.getElementById('productsScroll').scrollTop = 0;
 }
-
-loadInventory();
 
 /* ── DRAWER ── */
 const drawer = document.getElementById('drawer');
