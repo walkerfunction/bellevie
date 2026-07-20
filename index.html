@@ -435,6 +435,40 @@
       box-shadow: 0 2px 12px rgba(0,0,0,0.2); z-index: 10;
       display: flex; align-items: center; justify-content: center;
     }
+
+    /* ── MUSIC TOGGLE BUTTON ── */
+    .music-btn {
+      position: absolute;
+      top: calc(env(safe-area-inset-top, 0px) + 14px);
+      right: 14px;
+      width: 38px; height: 38px;
+      background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(200,150,12,0.4);
+      border-radius: 50%;
+      color: var(--gold-lt);
+      font-size: 1.05rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, opacity 0.2s;
+      z-index: 200;
+      line-height: 1;
+    }
+    .music-btn:hover { background: rgba(0,0,0,0.55); }
+    .music-btn.muted { color: rgba(255,255,255,0.35); border-color: rgba(255,255,255,0.15); }
+    @media (min-width: 768px) {
+      .music-btn { top: calc(env(safe-area-inset-top, 0px) + 58px); }
+    }
+
+    /* ── DRAWER HOME LINK ── */
+    .drawer-home-btn {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 0.78rem; font-weight: 400; letter-spacing: 0.06em;
+      color: var(--ink-faint); background: none; border: none;
+      cursor: pointer; font-family: var(--ui); padding: 0 4px;
+      text-decoration: none; transition: color 0.15s;
+    }
+    .drawer-home-btn:hover { color: var(--gold); }
   </style>
 </head>
 <body>
@@ -486,6 +520,9 @@
       <button class="panel-arrow left" onclick="goPanel(0)" title="Instagram" style="left:0">‹</button>
       <button class="panel-arrow right" onclick="goPanel(2)" title="BV Junior" style="right:0">›</button>
 
+      <!-- Music toggle -->
+      <button class="music-btn muted" id="musicBtn" onclick="toggleMusic()" title="Toggle ambient music" aria-label="Toggle music">♪</button>
+
       <!-- Obvious browse tab fixed at bottom -->
       <div class="browse-tab" id="browseTab" onclick="openDrawer()">
         <div class="browse-tab-handle"></div>
@@ -504,6 +541,13 @@
         <div class="drawer-bar">
           <button class="drawer-close" onclick="closeDrawer()">↓</button>
           <span class="drawer-label">Collection</span>
+          <button class="drawer-home-btn" onclick="closeDrawer()">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 5.5L6 1l5 4.5"/>
+              <rect x="2.5" y="5.5" width="7" height="5" rx="0.5"/>
+            </svg>
+            Home
+          </button>
         </div>
         <div class="cat-tabs">
           <button class="cat-tab active" onclick="filterCat('all',this)">All</button>
@@ -642,19 +686,24 @@ function filterCat(cat, btn) {
 const drawer = document.getElementById('drawer');
 const browseTab = document.getElementById('browseTab');
 function openDrawer()  { drawer.classList.add('open'); browseTab.style.opacity='0'; browseTab.style.pointerEvents='none'; }
-function closeDrawer() { drawer.classList.remove('open'); browseTab.style.opacity='1'; browseTab.style.pointerEvents=''; }
+function closeDrawer() { drawer.classList.remove('open'); browseTab.style.opacity='1'; browseTab.style.pointerEvents=''; goPanel(1); }
 
 /* ── PANEL NAV ── */
 const hTrack = document.getElementById('hTrack');
 let curPanel = 1;
 
 function goPanel(n) {
+  const prev = curPanel;
   curPanel = Math.max(0, Math.min(2, n));
   hTrack.style.transform = `translateX(${-curPanel * 33.333}%)`;
   document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i===curPanel));
-  // sync desktop nav
   const dnBtns = [document.getElementById('dnIG'), document.getElementById('dnHome'), document.getElementById('dnJr')];
   dnBtns.forEach((b,i) => b && b.classList.toggle('active', i===curPanel));
+  // music: fade in on home, fade out when leaving
+  if (_audioUnlockDone) {
+    if (curPanel === 1 && !Music.isMuted()) Music.start();
+    else if (prev === 1)                    Music.stop();
+  }
 }
 
 /* ── TOUCH GESTURES ── */
@@ -762,6 +811,238 @@ document.addEventListener('mouseup', e => {
   }
   mx0 = null; mDragging = false;
 });
+
+/* ─────────────────────────────────────────
+   RAJASTHANI AMBIENT MUSIC — Web Audio API
+   Instruments: Sarangi (bowed strings),
+                Algoza (double flute),
+                Khartal (wood clappers),
+                Tanpura (drone)
+   Scale: Raga Bhairav (morning raga)
+──────────────────────────────────────────*/
+const Music = (() => {
+  let ctx = null, master = null;
+  let playing = false, muted = true;
+  let droneNodes = [], loopTimer = null;
+  let phraseIdx = 0;
+
+  // Bhairav semitones: Sa Re(komal) Ga Ma Pa Dha(komal) Ni
+  const SCALE = [0, 1, 4, 5, 7, 8, 11];
+
+  function hz(semi, oct) {
+    return 261.63 * Math.pow(2, (semi + (oct - 4) * 12) / 12);
+  }
+
+  function unlock() {
+    if (!ctx) {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      master = ctx.createGain();
+      master.gain.value = 0;
+      master.connect(ctx.destination);
+    }
+    if (ctx.state === 'suspended') ctx.resume(); // fire-and-forget for iOS
+  }
+
+  /* Tanpura drone: C3 + G3 + C4 with slight detuning */
+  function startDrone() {
+    [[130.81, 0.11], [130.95, 0.07], [131.10, 0.05],
+     [196.00, 0.09], [261.63, 0.08]].forEach(([f, g]) => {
+      const osc = ctx.createOscillator();
+      const gn  = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = f;
+      gn.gain.value = g * 0.45;
+      osc.connect(gn); gn.connect(master);
+      osc.start();
+      droneNodes.push({ osc, gn });
+    });
+  }
+
+  function stopDrone() {
+    droneNodes.forEach(({ osc }) => { try { osc.stop(); } catch(e){} });
+    droneNodes = [];
+  }
+
+  /* Sarangi — bowed string: sawtooth + resonant LP + vibrato */
+  function sarangi(f, dur, when, vel) {
+    vel = vel || 0.44;
+    const o1 = ctx.createOscillator(), o2 = ctx.createOscillator();
+    const filt = ctx.createBiquadFilter();
+    const env  = ctx.createGain();
+    const vo   = ctx.createOscillator(), vg = ctx.createGain();
+
+    o1.type = o2.type = 'sawtooth';
+    o1.frequency.value = f;
+    o2.frequency.value = f * 1.0042; // chorus shimmer
+
+    filt.type = 'lowpass';
+    filt.frequency.value = f * 2.6;
+    filt.Q.value = 5.5;
+
+    vo.frequency.value = 4.8 + Math.random() * 1.4; // vibrato rate
+    vg.gain.value = f * 0.012;
+    vo.connect(vg); vg.connect(o1.frequency); vg.connect(o2.frequency);
+
+    const atk = Math.min(0.38, dur * 0.28);
+    env.gain.setValueAtTime(0, when);
+    env.gain.linearRampToValueAtTime(vel * 0.32, when + atk);
+    env.gain.setValueAtTime(vel * 0.26, when + dur - 0.32);
+    env.gain.linearRampToValueAtTime(0, when + dur);
+
+    o1.connect(filt); o2.connect(filt); filt.connect(env); env.connect(master);
+    [o1, o2, vo].forEach(o => { o.start(when); o.stop(when + dur + 0.08); });
+  }
+
+  /* Algoza — double flute: two detuned sines + breath noise + vibrato */
+  function algoza(f, dur, when, vel) {
+    vel = vel || 0.38;
+    const o1 = ctx.createOscillator(), o2 = ctx.createOscillator();
+    const harm = ctx.createOscillator();
+    const env  = ctx.createGain(), harmGn = ctx.createGain();
+    const vo   = ctx.createOscillator(), vg = ctx.createGain();
+
+    o1.type = o2.type = 'sine';
+    o1.frequency.value = f;
+    o2.frequency.value = f * 1.007; // pipe detuning — Algoza shimmer
+
+    harm.type = 'sine';
+    harm.frequency.value = f * 3.01; // 3rd harmonic for flute brightness
+
+    vo.frequency.value = 5.5 + Math.random();
+    vg.gain.value = f * 0.007;
+    vo.connect(vg); vg.connect(o1.frequency); vg.connect(o2.frequency);
+
+    // Breath noise
+    const nLen = Math.ceil(ctx.sampleRate * dur);
+    const nBuf = ctx.createBuffer(1, nLen, ctx.sampleRate);
+    const nDat = nBuf.getChannelData(0);
+    for (let i = 0; i < nLen; i++) nDat[i] = (Math.random() * 2 - 1);
+    const nSrc = ctx.createBufferSource(); nSrc.buffer = nBuf;
+    const nFilt = ctx.createBiquadFilter();
+    nFilt.type = 'bandpass'; nFilt.frequency.value = f; nFilt.Q.value = 1.8;
+    const nGn = ctx.createGain(); nGn.gain.value = 0.018;
+    nSrc.connect(nFilt); nFilt.connect(nGn); nGn.connect(master);
+
+    env.gain.setValueAtTime(0, when);
+    env.gain.linearRampToValueAtTime(vel * 0.24, when + 0.07);
+    env.gain.setValueAtTime(vel * 0.20, when + dur - 0.14);
+    env.gain.linearRampToValueAtTime(0, when + dur);
+
+    harmGn.gain.value = 0.028;
+
+    o1.connect(env); o2.connect(env); env.connect(master);
+    harm.connect(harmGn); harmGn.connect(master);
+
+    [o1, o2, harm, vo].forEach(o => { o.start(when); o.stop(when + dur + 0.06); });
+    nSrc.start(when); nSrc.stop(when + dur);
+  }
+
+  /* Khartal — wood clapper: short noise burst + bandpass */
+  function khartal(when, vel) {
+    vel = vel || 0.5;
+    const bLen = Math.floor(ctx.sampleRate * 0.055);
+    const buf  = ctx.createBuffer(1, bLen, ctx.sampleRate);
+    const dat  = buf.getChannelData(0);
+    for (let i = 0; i < bLen; i++)
+      dat[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bLen * 0.055));
+
+    const src  = ctx.createBufferSource(); src.buffer = buf;
+    const filt = ctx.createBiquadFilter();
+    filt.type = 'bandpass'; filt.frequency.value = 2400; filt.Q.value = 9;
+    const gn   = ctx.createGain();
+    gn.gain.setValueAtTime(vel * 0.6, when);
+    gn.gain.exponentialRampToValueAtTime(0.001, when + 0.05);
+
+    src.connect(filt); filt.connect(gn); gn.connect(master);
+    src.start(when);
+  }
+
+  /* Schedule a musical phrase then loop */
+  function schedulePhrase() {
+    if (!playing) return;
+    const now = ctx.currentTime;
+    phraseIdx++;
+
+    /* Alternate between Sarangi phrases and Algoza phrases */
+    const useFlutte = (phraseIdx % 3 === 0);
+    const notes = 3 + Math.floor(Math.random() * 3);
+    let t = now + 0.15;
+
+    for (let i = 0; i < notes; i++) {
+      const semi = SCALE[Math.floor(Math.random() * SCALE.length)];
+      const oct  = useFlutte ? 5 : (Math.random() > 0.72 ? 3 : 4);
+      const f    = hz(semi, oct);
+      const dur  = useFlutte ? (0.7 + Math.random() * 1.4) : (1.4 + Math.random() * 2.8);
+      const gap  = 0.08 + Math.random() * 0.55;
+
+      if (useFlutte) algoza(f, dur, t);
+      else           sarangi(f, dur, t);
+
+      t += dur + gap;
+    }
+
+    /* Khartal pattern: sporadic on alternate phrases */
+    if (phraseIdx % 2 === 0) {
+      const bi = 0.62 + Math.random() * 0.22; // beat interval
+      // Typical Rajasthani 7-beat feel: 1-2-3_-4-5-6-7_ (3+4)
+      [0, 1, 2, 3.5, 4.5, 5.5, 7].forEach(b =>
+        Math.random() > 0.25 && khartal(now + 0.6 + b * bi, 0.28 + Math.random() * 0.28)
+      );
+    }
+
+    const totalDur = (t - now) + 2 + Math.random() * 3.5;
+    loopTimer = setTimeout(schedulePhrase, Math.max(0, (totalDur - 0.6) * 1000));
+  }
+
+  function start() {
+    if (playing || muted) return;
+    unlock();
+    playing = true;
+    startDrone();
+    schedulePhrase();
+    master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
+    master.gain.linearRampToValueAtTime(0.52, ctx.currentTime + 2.8); // soft fade-in
+  }
+
+  function stop() {
+    playing = false;
+    clearTimeout(loopTimer);
+    if (!ctx) return;
+    master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
+    master.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.6);
+    setTimeout(stopDrone, 1700);
+  }
+
+  function toggleMute() {
+    muted = !muted;
+    const btn = document.getElementById('musicBtn');
+    if (muted) {
+      btn.textContent = '♪';
+      btn.classList.add('muted');
+      btn.title = 'Play ambient music';
+      stop();
+    } else {
+      btn.textContent = '♬';
+      btn.classList.remove('muted');
+      btn.title = 'Mute music';
+      if (curPanel === 1) start();
+    }
+  }
+
+  return { start, stop, toggleMute, isMuted: () => muted };
+})();
+
+function toggleMusic() { Music.toggleMute(); }
+
+/* ── UNLOCK AUDIO ON FIRST INTERACTION ── */
+let _audioUnlockDone = false;
+function _unlockAudio() {
+  if (_audioUnlockDone) return;
+  _audioUnlockDone = true;
+  if (curPanel === 1 && !Music.isMuted()) Music.start();
+}
+document.addEventListener('touchstart', _unlockAudio, { once: true, passive: true });
+document.addEventListener('mousedown',  _unlockAudio, { once: true });
 
 /* ── WAVE GLITTER CANVAS ── */
 (function() {
