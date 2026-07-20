@@ -10,7 +10,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/soundfont-player@0.12.0/dist/soundfont-player.min.js"></script>
   <style>
     :root {
       --gold: #C8960C;
@@ -655,6 +654,8 @@
   </div>
 </div>
 
+<audio id="bgMusic" src="audio/rajasthani.mp3" loop preload="auto"></audio>
+
 <script>
 /* ── PRODUCTS ── */
 const PRODUCTS = [
@@ -745,10 +746,10 @@ function goPanel(n) {
   document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i===curPanel));
   const dnBtns = [document.getElementById('dnIG'), document.getElementById('dnHome'), document.getElementById('dnJr')];
   dnBtns.forEach((b,i) => b && b.classList.toggle('active', i===curPanel));
-  // music: fade in on home, fade out when leaving
-  if (_audioUnlockDone) {
-    if (curPanel === 1 && !Music.isMuted()) Music.start();
-    else if (prev === 1)                    Music.stop();
+  // music: fade in on home panel, fade out when leaving
+  if (!Music.isMuted()) {
+    if (curPanel === 1) Music.start();
+    else if (prev === 1) Music.fadeOut();
   }
 }
 
@@ -858,163 +859,55 @@ document.addEventListener('mouseup', e => {
   mx0 = null; mDragging = false;
 });
 
-/* ─────────────────────────────────────────
-   RAJASTHANI AMBIENT MUSIC
-   Sitar + Shakuhachi via soundfont-player CDN
-   (real instrument samples, not oscillators)
-   Tanpura drone + Khartal via Web Audio API
-   Scale: Raga Bhairav — C Db E F G Ab B
-──────────────────────────────────────────*/
+/* ── RAJASTHANI AMBIENT MUSIC ── */
 const Music = (() => {
-  let ctx = null, master = null;
-  let sitr = null, flute = null;       // soundfont instruments
-  let playing = false, muted = true, loaded = false, loading = false;
-  let droneNodes = [], loopTimer = null, phraseIdx = 0;
+  const audio = document.getElementById('bgMusic');
+  let muted = true, started = false, fadeTimer = null;
+  const TARGET = 0.13;
 
-  // Bhairav: Sa Re(k) Ga Ma Pa Dha(k) Ni
-  const BHAIRAV = ['C', 'Db', 'E', 'F', 'G', 'Ab', 'B'];
-
-  function initCtx() {
-    if (ctx) return;
-    ctx = new (window.AudioContext || window.webkitAudioContext)();
-    master = ctx.createGain();
-    master.gain.value = 0;
-    master.connect(ctx.destination);
+  function fadeTo(target, ms) {
+    clearInterval(fadeTimer);
+    const from = audio.volume, steps = 40, dt = ms / steps;
+    let i = 0;
+    fadeTimer = setInterval(() => {
+      i++;
+      audio.volume = Math.max(0, Math.min(1, from + (target - from) * (i / steps)));
+      if (i >= steps) clearInterval(fadeTimer);
+    }, dt);
   }
 
-  function resumeCtx() {
-    if (ctx && ctx.state === 'suspended') ctx.resume();
-  }
-
-  /* Load real instrument samples from CDN */
-  function loadInstruments() {
-    if (loaded || loading) return Promise.resolve();
-    loading = true;
-    const btn = document.getElementById('musicBtn');
-    if (btn) { btn.textContent = '…'; btn.title = 'Loading…'; }
-
-    const SF = window.Soundfont;
-    if (!SF) return Promise.resolve();
-
-    return Promise.all([
-      SF.instrument(ctx, 'sitar',      { soundfont: 'MusyngKite', destination: master }),
-      SF.instrument(ctx, 'shakuhachi', { soundfont: 'MusyngKite', destination: master }),
-    ]).then(([s, f]) => {
-      sitr = s; flute = f;
-      loaded = true; loading = false;
-      const b = document.getElementById('musicBtn');
-      if (b && !muted) { b.textContent = '♬'; b.classList.remove('muted'); }
-    }).catch(() => { loading = false; });
-  }
-
-  /* Tanpura drone: detuned C3/G3/C4 sine cluster */
-  function startDrone() {
-    [[130.81,0.10],[130.96,0.06],[131.12,0.04],[196.00,0.08],[261.63,0.07]].forEach(([f,g]) => {
-      const osc = ctx.createOscillator(), gn = ctx.createGain();
-      osc.type = 'sine'; osc.frequency.value = f;
-      gn.gain.value = g * 0.42;
-      osc.connect(gn); gn.connect(master); osc.start();
-      droneNodes.push({ osc });
-    });
-  }
-  function stopDrone() {
-    droneNodes.forEach(({ osc }) => { try { osc.stop(); } catch(e){} });
-    droneNodes = [];
-  }
-
-  /* Khartal: bandpass-filtered noise click */
-  function khartal(when) {
-    const len = Math.floor(ctx.sampleRate * 0.055);
-    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
-    const d = buf.getChannelData(0);
-    for (let i = 0; i < len; i++) d[i] = (Math.random()*2-1) * Math.exp(-i/(len*0.055));
-    const src = ctx.createBufferSource(); src.buffer = buf;
-    const flt = ctx.createBiquadFilter(); flt.type='bandpass'; flt.frequency.value=2400; flt.Q.value=9;
-    const gn  = ctx.createGain();
-    gn.gain.setValueAtTime(0.5, when);
-    gn.gain.exponentialRampToValueAtTime(0.001, when + 0.05);
-    src.connect(flt); flt.connect(gn); gn.connect(master); src.start(when);
-  }
-
-  /* Schedule a phrase of sitar or flute notes, then loop */
-  function schedulePhrase() {
-    if (!playing) return;
-    if (!loaded) { loopTimer = setTimeout(schedulePhrase, 400); return; }
-
-    const now = ctx.currentTime;
-    phraseIdx++;
-    const useFlute = (phraseIdx % 3 === 0);
-    const player   = useFlute ? flute : sitr;
-    const count    = 3 + Math.floor(Math.random() * 3);
-    let t = now + 0.25;
-
-    for (let i = 0; i < count; i++) {
-      const name = BHAIRAV[Math.floor(Math.random() * BHAIRAV.length)];
-      const oct  = useFlute ? (4 + (Math.random()>0.6?1:0)) : (3 + (Math.random()>0.65?1:0));
-      const dur  = useFlute ? (0.9 + Math.random()*1.6) : (1.6 + Math.random()*3.0);
-      const gap  = 0.12 + Math.random() * 0.6;
-      const gain = useFlute ? (0.55 + Math.random()*0.3) : (0.45 + Math.random()*0.35);
-      player.play(name + oct, t, { duration: dur, gain });
-      t += dur + gap;
-    }
-
-    /* Khartal: sporadic 7-beat pattern on even phrases */
-    if (phraseIdx % 2 === 0) {
-      const bi = 0.60 + Math.random() * 0.22;
-      [0, 1, 2, 3.5, 4.5, 5.5, 7].forEach(b =>
-        Math.random() > 0.3 && khartal(now + 0.7 + b * bi));
-    }
-
-    const total = (t - now) + 2 + Math.random() * 3.5;
-    loopTimer = setTimeout(schedulePhrase, Math.max(0, (total - 0.6) * 1000));
-  }
-
+  // start() called from button tap = user gesture → audio.play() allowed on mobile
+  // When called from goPanel() (swipe), started=true so play() is skipped — just fade volume
   function start() {
-    if (playing || muted) return;
-    initCtx(); resumeCtx();
-    playing = true;
-    startDrone();
-    master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
-    master.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 3);
-    loadInstruments().then(() => { if (playing) schedulePhrase(); });
+    if (muted) return;
+    if (!started) {
+      audio.volume = 0;
+      audio.play().catch(() => {});
+      started = true;
+    }
+    fadeTo(TARGET, 2800);
   }
 
-  function stop() {
-    playing = false;
-    clearTimeout(loopTimer);
-    if (!ctx) return;
-    master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
-    master.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.6);
-    setTimeout(stopDrone, 1700);
+  function fadeOut() {
+    fadeTo(0, 1600);
   }
 
   function toggleMute() {
     muted = !muted;
     const btn = document.getElementById('musicBtn');
     if (muted) {
-      btn.textContent = '♪'; btn.classList.add('muted'); btn.title = 'Play ambient music';
-      stop();
+      btn.textContent = '♪'; btn.classList.add('muted'); btn.title = 'Play music';
+      fadeOut();
     } else {
-      btn.textContent = loaded ? '♬' : '…';
-      btn.classList.remove('muted'); btn.title = 'Mute music';
-      if (curPanel === 1) start();
+      btn.textContent = '♬'; btn.classList.remove('muted'); btn.title = 'Mute music';
+      if (curPanel === 1) start(); // direct button click → safe on mobile
     }
   }
 
-  return { start, stop, toggleMute, isMuted: () => muted };
+  return { start, fadeOut, toggleMute, isMuted: () => muted };
 })();
 
 function toggleMusic() { Music.toggleMute(); }
-
-/* ── UNLOCK AUDIO ON FIRST INTERACTION ── */
-let _audioUnlockDone = false;
-function _unlockAudio() {
-  if (_audioUnlockDone) return;
-  _audioUnlockDone = true;
-  if (curPanel === 1 && !Music.isMuted()) Music.start();
-}
-document.addEventListener('touchstart', _unlockAudio, { once: true, passive: true });
-document.addEventListener('mousedown',  _unlockAudio, { once: true });
 
 /* ── WAVE GLITTER CANVAS ── */
 (function() {
