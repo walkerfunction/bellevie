@@ -94,6 +94,42 @@
       font-size: 0.65rem; color: rgba(255,255,255,0.25);
       letter-spacing: 0.18em; text-transform: uppercase;
     }
+    /* Back-to-home buttons on side panels */
+    .back-btn {
+      position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%);
+      background: rgba(255,255,255,0.14);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.35);
+      color: rgba(255,255,255,0.9); border-radius: 28px;
+      padding: 12px 32px; font-size: 0.95rem; font-weight: 400;
+      letter-spacing: 0.12em; font-family: var(--ui);
+      cursor: pointer; white-space: nowrap; z-index: 10;
+      transition: background 0.2s;
+    }
+    .back-btn:hover, .back-btn:active { background: rgba(255,255,255,0.25); }
+    /* On junior panel (light background) override */
+    .panel-junior .back-btn {
+      background: rgba(212,96,122,0.1);
+      border-color: rgba(212,96,122,0.35);
+      color: var(--rose);
+    }
+    .panel-junior .back-btn:hover { background: rgba(212,96,122,0.2); }
+
+    /* Visible side-swipe arrows on home panel */
+    .panel-arrow {
+      position: absolute; top: 50%; z-index: 5;
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.7); border: none;
+      width: 36px; height: 72px; border-radius: 0 36px 36px 0;
+      font-size: 1rem; cursor: pointer; transform: translateY(-50%);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .panel-arrow.right {
+      right: 0; border-radius: 36px 0 0 36px;
+    }
+    .panel-arrow:hover { background: rgba(255,255,255,0.22); }
 
     /* ─────────────────────────────────────────
        HOME PANEL (center)
@@ -102,18 +138,21 @@
 
     .hero-photo {
       position: absolute; inset: 0;
-      background: url('images/gphoto_9.jpg') center 20%/cover no-repeat;
+      background: url('images/gphoto_9.jpg') center 55%/cover no-repeat;
       filter: brightness(1.05) saturate(1.1) contrast(0.95);
     }
-    /* soft warm gradient at top so gold logo reads clearly, bright below */
+    /* soft gradient at top so gold logo reads, plate is bright below */
     .hero-photo::after {
       content: '';
       position: absolute; inset: 0;
       background: linear-gradient(to bottom,
-        rgba(30,20,10,0.45) 0%,
-        rgba(20,14,6,0.15) 40%,
-        rgba(0,0,0,0) 70%
+        rgba(20,14,6,0.5) 0%,
+        rgba(10,7,3,0.1) 35%,
+        rgba(0,0,0,0) 60%
       );
+    }
+    @media (min-width: 768px) {
+      .hero-photo { background-position: center 45%; }
     }
 
     #waveCanvas {
@@ -352,6 +391,7 @@
       </div>
       <a href="https://www.instagram.com/bellevie_studios/" target="_blank" rel="noopener" class="ig-btn">Open Instagram ↗</a>
       <div class="ig-swipe-label">← SWIPE RIGHT FOR HOME →</div>
+      <button class="back-btn" onclick="goPanel(1)">← Back to Home</button>
     </div>
 
     <!-- ══════════ HOME PANEL ══════════ -->
@@ -365,6 +405,10 @@
         <p class="hero-sub">Pottery · Jewelry · Home Decor</p>
         <button class="browse-btn" onclick="openDrawer()">Browse Collection</button>
       </div>
+
+      <!-- Side nav arrows on home panel -->
+      <button class="panel-arrow left" onclick="goPanel(0)" title="Instagram" style="left:0">‹</button>
+      <button class="panel-arrow right" onclick="goPanel(2)" title="BV Junior" style="right:0">›</button>
 
       <div class="swipe-up-cue" id="swipeCue">
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -403,6 +447,7 @@
         <div class="junior-grid" id="juniorGrid"></div>
       </div>
       <div class="jr-swipe-label">← SWIPE LEFT FOR HOME</div>
+      <button class="back-btn" onclick="goPanel(1)">Back to Home →</button>
     </div>
 
   </div><!-- /.h-track -->
@@ -595,10 +640,42 @@ function updateLbImg() {
     : '';
 }
 document.addEventListener('keydown', e => {
-  if (!document.getElementById('lightbox').classList.contains('active')) return;
-  if (e.key==='Escape') closeLightbox();
-  if (e.key==='ArrowLeft') lbNav(-1);
-  if (e.key==='ArrowRight') lbNav(1);
+  if (document.getElementById('lightbox').classList.contains('active')) {
+    if (e.key==='Escape') closeLightbox();
+    if (e.key==='ArrowLeft') lbNav(-1);
+    if (e.key==='ArrowRight') lbNav(1);
+    return;
+  }
+  // Keyboard panel nav
+  if (e.key==='ArrowLeft')  goPanel(curPanel - 1);
+  if (e.key==='ArrowRight') goPanel(curPanel + 1);
+});
+
+/* ── MOUSE DRAG (desktop) ── */
+let mx0 = null, my0 = null, mDragging = false;
+document.addEventListener('mousedown', e => {
+  if (e.target.closest('button,a,input,.products-scroll,.panel-junior')) return;
+  mx0 = e.clientX; my0 = e.clientY; mDragging = false;
+});
+document.addEventListener('mousemove', e => {
+  if (mx0 === null) return;
+  if (!mDragging && Math.abs(e.clientX - mx0) > 8) {
+    mDragging = true;
+    hTrack.style.transition = 'none'; // live drag feel
+  }
+});
+document.addEventListener('mouseup', e => {
+  if (mx0 === null) return;
+  const dx = e.clientX - mx0;
+  const dy = e.clientY - my0;
+  hTrack.style.transition = '';
+  if (mDragging && Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+    if (dx < 0) goPanel(curPanel + 1);
+    else         goPanel(curPanel - 1);
+  } else if (!mDragging) {
+    // reset — was a click, not a drag
+  }
+  mx0 = null; mDragging = false;
 });
 
 /* ── WAVE GLITTER CANVAS ── */
