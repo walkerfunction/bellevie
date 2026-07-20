@@ -975,7 +975,7 @@ const Music = (() => {
     playing = true;
     startDrone();
     master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
-    master.gain.linearRampToValueAtTime(0.58, ctx.currentTime + 3);
+    master.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 3);
     loadInstruments().then(() => { if (playing) schedulePhrase(); });
   }
 
